@@ -6,6 +6,7 @@ all: $(CONTIKI_PROJECT)
 PLATFORMS_EXCLUDE = sky z1
 
 CONTIKI=../../..
+MAKE_MAC = MAKE_MAC_TSCH
 
 # Include the CoAP implementation
 include $(CONTIKI)/Makefile.dir-variables

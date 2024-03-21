@@ -48,6 +48,14 @@
 #include "dev/button-sensor.h"
 #endif
 
+#include "sys/node-id.h"
+#include "sys/log.h"
+#include "net/ipv6/uip-ds6-route.h"
+#include "net/ipv6/uip-sr.h"
+#include "net/mac/tsch/tsch.h"
+#include "net/routing/routing.h"
+
+
 /* Log configuration */
 #include "sys/log.h"
 #define LOG_MODULE "App"
@@ -87,6 +95,13 @@ AUTOSTART_PROCESSES(&er_example_server);
 PROCESS_THREAD(er_example_server, ev, data)
 {
   PROCESS_BEGIN();
+
+  #if CONTIKI_TARGET_COOJA || CONTIKI_TARGET_Z1
+  if(node_id == 1) { /* Coordinator node. */
+    NETSTACK_ROUTING.root_start();
+  }
+  #endif
+  NETSTACK_MAC.on();
 
   PROCESS_PAUSE();
 

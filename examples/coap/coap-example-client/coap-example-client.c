@@ -49,15 +49,22 @@
 #include "dev/button-sensor.h"
 #endif
 
+#include "sys/node-id.h"
+#include "sys/log.h"
+#include "net/ipv6/uip-ds6-route.h"
+#include "net/ipv6/uip-sr.h"
+#include "net/mac/tsch/tsch.h"
+#include "net/routing/routing.h"
+
 /* Log configuration */
 #include "coap-log.h"
 #define LOG_MODULE "App"
 #define LOG_LEVEL  LOG_LEVEL_APP
 
 /* FIXME: This server address is hard-coded for Cooja and link-local for unconnected border router. */
-#define SERVER_EP "coap://[fe80::212:7402:0002:0202]"
+#define SERVER_EP "coap://[fe80::201:1:1:1]"
 
-#define TOGGLE_INTERVAL 10
+#define TOGGLE_INTERVAL 100
 
 PROCESS(er_example_client, "Erbium Example Client");
 AUTOSTART_PROCESSES(&er_example_client);
@@ -65,10 +72,10 @@ AUTOSTART_PROCESSES(&er_example_client);
 static struct etimer et;
 
 /* Example URIs that can be queried. */
-#define NUMBER_OF_URLS 4
+#define NUMBER_OF_URLS 5
 /* leading and ending slashes only for demo purposes, get cropped automatically when setting the Uri-Path */
 char *service_urls[NUMBER_OF_URLS] =
-{ ".well-known/core", "/actuators/toggle", "battery/", "error/in//path" };
+{ ".well-known/core", "/actuators/toggle", "battery/", "error/in//path", "/test/hello" };
 #if PLATFORM_HAS_BUTTON
 static int uri_switch = 0;
 #endif
@@ -92,6 +99,13 @@ PROCESS_THREAD(er_example_client, ev, data)
 {
   static coap_endpoint_t server_ep;
   PROCESS_BEGIN();
+
+  #if CONTIKI_TARGET_COOJA || CONTIKI_TARGET_Z1
+  if(node_id == 1) { /* Coordinator node. */
+    NETSTACK_ROUTING.root_start();
+  }
+  #endif
+  NETSTACK_MAC.on();
 
   static coap_message_t request[1];      /* This way the packet can be treated as pointer as usual. */
 
@@ -139,9 +153,9 @@ PROCESS_THREAD(er_example_client, ev, data)
       /* send a request to notify the end of the process */
 
       coap_init_message(request, COAP_TYPE_CON, COAP_GET, 0);
-      coap_set_header_uri_path(request, service_urls[uri_switch]);
+      coap_set_header_uri_path(request, service_urls[4]);
 
-      printf("--Requesting %s--\n", service_urls[uri_switch]);
+      printf("--Requesting %s--\n", service_urls[4]);
 
       LOG_INFO_COAP_EP(&server_ep);
       LOG_INFO_("\n");
@@ -151,7 +165,7 @@ PROCESS_THREAD(er_example_client, ev, data)
 
       printf("\n--Done--\n");
 
-      uri_switch = (uri_switch + 1) % NUMBER_OF_URLS;
+      // uri_switch = (uri_switch + 1) % NUMBER_OF_URLS;
 #endif /* PLATFORM_HAS_BUTTON */
     }
   }

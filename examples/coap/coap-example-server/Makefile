@@ -6,9 +6,10 @@ PLATFORMS_EXCLUDE = sky z1
 
 # Include CoAP resources
 MODULES_REL += ./resources
+MAKE_MAC = MAKE_MAC_TSCH
 
 CONTIKI=../../..
-
+MODULES += os/services/shell
 # Include the CoAP implementation
 include $(CONTIKI)/Makefile.dir-variables
 MODULES += $(CONTIKI_NG_APP_LAYER_DIR)/coap
