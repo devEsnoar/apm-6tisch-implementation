@@ -1,4 +1,4 @@
-CONTIKI_PROJECT = coap-server
+CONTIKI_PROJECT = node-server
 all: $(CONTIKI_PROJECT)
 
 CONTIKI=../../..
