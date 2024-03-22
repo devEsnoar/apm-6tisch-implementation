@@ -47,9 +47,8 @@
 
 static void res_post_handler(coap_message_t *request, coap_message_t *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset);
 
-/* A simple actuator example. Toggles the red led */
-RESOURCE(res_toggle,
-         "title=\"Red LED\";rt=\"Control\"",
+RESOURCE(res_send_dummy,
+         "title=\"Send dummy\";rt=\"Send\"",
          NULL,
          res_post_handler,
          NULL,
@@ -60,7 +59,6 @@ res_post_handler(coap_message_t *request, coap_message_t *response, uint8_t *buf
 {
   
   const uint8_t *payload = NULL;
-  // leds_toggle(LEDS_RED);
   if(coap_get_payload(request, &payload) > 0) {
     uint16_t received_short = ((uint16_t)payload[1] << 8) | payload[0];
     printf("Variable value: %d\n",  received_short);

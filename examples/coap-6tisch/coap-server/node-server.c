@@ -25,9 +25,10 @@
  */
 extern coap_resource_t
   res_hello;
-#if PLATFORM_HAS_LEDS
-  extern coap_resource_t res_leds, res_toggle;
-#endif
+
+extern coap_resource_t 
+  res_send_dummy;
+
 
 PROCESS(er_example_server, "Coap-6TiSCH Example Server");
 AUTOSTART_PROCESSES(&er_example_server);
@@ -52,10 +53,8 @@ PROCESS_THREAD(er_example_server, ev, data)
   LOG_INFO("Starting Coap-6TiSCH Example Server\n");
 
   coap_activate_resource(&res_hello, "test/hello");
-#if PLATFORM_HAS_LEDS
-/*  coap_activate_resource(&res_leds, "actuators/leds"); */
-  coap_activate_resource(&res_toggle, "actuators/toggle");
-#endif
+  coap_activate_resource(&res_send_dummy, "send/dummy");
+
 
   
 #if WITH_PERIODIC_ROUTES_PRINT
