@@ -9,6 +9,9 @@
 #include "net/ipv6/uip-sr.h"
 #include "net/mac/tsch/tsch.h"
 #include "net/routing/routing.h"
+#include "net/routing/rpl-lite/rpl-types.h"
+#include "net/routing/rpl-lite/rpl-dag.h"
+#include "os/lib/random.h"
 
 #include "contiki-net.h"
 #include "coap-engine.h"
@@ -27,9 +30,13 @@
 #define LOG_MODULE "App"
 #define LOG_LEVEL  LOG_LEVEL_APP
 
+#if CONTIKI_TARGET_COOJA
 #define SERVER_EP "coap://[fd00::201:1:1:1]"
+#else
+#define SERVER_EP "coap://[fd00::f6ce:36a2:9c50:4687]"
+#endif
 
-#define TOGGLE_INTERVAL 100
+#define TOGGLE_INTERVAL 5
 
 /*---------------------------------------------------------------------------*/
 PROCESS(er_example_client, "Coap-6TiSCH Example Client");
@@ -72,33 +79,42 @@ PROCESS_THREAD(er_example_client, ev, data)
 #endif
   NETSTACK_MAC.on();
 
+  random_init(0);
+
   static coap_message_t request[1];      /* This way the packet can be treated as pointer as usual. */
 
   coap_endpoint_parse(SERVER_EP, strlen(SERVER_EP), &server_ep);
-
+  rpl_dag_t * dag;
   etimer_set(&et, TOGGLE_INTERVAL * CLOCK_SECOND);
-
   while(1) {
     PROCESS_YIELD();
 
-    if(false) {
-      printf("--Toggle timer--\n");
+    if(etimer_expired(&et)) {
+      dag = rpl_get_any_dag();
+      if(dag->state == DAG_REACHABLE) {
+        printf("--- Sending data ---\n");
 
-      /* prepare request, TID is set by COAP_BLOCKING_REQUEST() */
-      coap_init_message(request, COAP_TYPE_CON, COAP_POST, 0);
-      coap_set_header_uri_path(request, service_urls[1]);
+        /* prepare request, TID is set by COAP_BLOCKING_REQUEST() */
+        coap_init_message(request, COAP_TYPE_CON, COAP_POST, 0);
+        coap_set_header_uri_path(request, service_urls[1]);
 
-      const char msg[] = "Toggle!";
+        // const char msg_prefix[] = "Toggle!";
+        // char msg[100];
+        // int16_t size = sprintf(msg, "%s, Counter: %d", msg_prefix, random_rand()); 
+        short unsigned int random = random_rand();
+        // short unsigned int random = 25;
+        printf("--- Sending > %d\n", random);
+        coap_set_payload(request, (uint8_t *)&random, sizeof(short unsigned int));
 
-      coap_set_payload(request, (uint8_t *)msg, sizeof(msg) - 1);
+        LOG_INFO_COAP_EP(&server_ep);
+        LOG_INFO_("\n");
 
-      LOG_INFO_COAP_EP(&server_ep);
-      LOG_INFO_("\n");
+        COAP_BLOCKING_REQUEST(&server_ep, request, client_chunk_handler);
 
-      COAP_BLOCKING_REQUEST(&server_ep, request, client_chunk_handler);
+        printf("\n--Done--\n");
 
-      printf("\n--Done--\n");
-
+      }
+      
       etimer_reset(&et);
 
 #if PLATFORM_HAS_BUTTON
