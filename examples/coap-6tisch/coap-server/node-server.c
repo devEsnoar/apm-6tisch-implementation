@@ -40,6 +40,10 @@ PROCESS_THREAD(er_example_server, ev, data)
   if(node_id == 1) { /* Coordinator node. */
     NETSTACK_ROUTING.root_start();
   }
+#else
+  if(node_id == 18055) { /* Coordinator node. */
+    NETSTACK_ROUTING.root_start();
+  }
 #endif
   NETSTACK_MAC.on();
 

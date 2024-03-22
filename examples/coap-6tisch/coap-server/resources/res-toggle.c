@@ -43,7 +43,7 @@
 
 #include <string.h>
 
-#if PLATFORM_HAS_LEDS || LEDS_COUNT
+
 
 static void res_post_handler(coap_message_t *request, coap_message_t *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset);
 
@@ -58,7 +58,12 @@ RESOURCE(res_toggle,
 static void
 res_post_handler(coap_message_t *request, coap_message_t *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset)
 {
-  leds_toggle(LEDS_RED);
-  printf("LEDs Toggled!\n");
+  
+  const uint8_t *payload = NULL;
+  // leds_toggle(LEDS_RED);
+  if(coap_get_payload(request, &payload) > 0) {
+    uint16_t received_short = ((uint16_t)payload[1] << 8) | payload[0];
+    printf("Variable value: %d\n",  received_short);
+  }
 }
-#endif /* PLATFORM_HAS_LEDS */
+

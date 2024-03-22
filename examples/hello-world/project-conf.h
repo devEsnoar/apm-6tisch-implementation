@@ -8,4 +8,4 @@
 #ifndef CONTIKI_TARGET_SIMPLELINK
 #define LOG_CONF_LEVEL_FRAMER                      LOG_LEVEL_WARN
 #endif
-#define TSCH_LOG_CONF_PER_SLOT                     1
+#define TSCH_LOG_CONF_PER_SLOT                     0
