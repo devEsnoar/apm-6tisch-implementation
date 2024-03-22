@@ -9,8 +9,7 @@
 #include "net/ipv6/uip-sr.h"
 #include "net/mac/tsch/tsch.h"
 #include "net/routing/routing.h"
-#include "net/routing/rpl-lite/rpl-types.h"
-#include "net/routing/rpl-lite/rpl-dag.h"
+#include "net/routing/rpl-lite/rpl.h"
 #include "os/lib/random.h"
 
 #include "contiki-net.h"
@@ -84,14 +83,12 @@ PROCESS_THREAD(er_example_client, ev, data)
   static coap_message_t request[1];      /* This way the packet can be treated as pointer as usual. */
 
   coap_endpoint_parse(SERVER_EP, strlen(SERVER_EP), &server_ep);
-  rpl_dag_t * dag;
   etimer_set(&et, TOGGLE_INTERVAL * CLOCK_SECOND);
   while(1) {
     PROCESS_YIELD();
 
     if(etimer_expired(&et)) {
-      dag = rpl_get_any_dag();
-      if(dag->state == DAG_REACHABLE) {
+      if(rpl_is_reachable()) {
         printf("--- Sending data ---\n");
 
         /* prepare request, TID is set by COAP_BLOCKING_REQUEST() */
