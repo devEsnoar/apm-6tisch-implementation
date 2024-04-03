@@ -63,6 +63,10 @@
 #include "net/mac/tsch/sixtop/sixtop.h"
 #endif
 
+#if TSCH_WITH_INT
+#include "net/mac/tsch/int/int.h"
+#endif
+
 #if FRAME802154_VERSION < FRAME802154_IEEE802154_2015
 #error TSCH: FRAME802154_VERSION must be at least FRAME802154_IEEE802154_2015
 #endif
@@ -1122,6 +1126,8 @@ send_packet(mac_callback_t sent, void *ptr)
   tsch_security_set_packetbuf_attr(FRAME802154_DATAFRAME);
 #endif /* LLSEC802154_ENABLED */
 
+
+
   packetbuf_set_addr(PACKETBUF_ADDR_SENDER, &linkaddr_node_addr);
 
   max_transmissions = packetbuf_attr(PACKETBUF_ATTR_MAX_MAC_TRANSMISSIONS);
@@ -1129,11 +1135,29 @@ send_packet(mac_callback_t sent, void *ptr)
     /* If not set by the application, use the default TSCH value */
     max_transmissions = TSCH_MAC_MAX_FRAME_RETRIES + 1;
   }
+    
+#if TSCH_WITH_INT
+  if(!inband_network_telemetry_output() == 0){
+    ret = MAC_TX_ERR;
+    mac_call_sent_callback(sent, ptr, ret, 1);
+    return;
+  }
+#endif
 
   if((hdr_len = NETSTACK_FRAMER.create()) < 0) {
     LOG_ERR("! can't send packet due to framer error\n");
     ret = MAC_TX_ERR;
   } else {
+
+    // AFTER CREATING FRAME, INVOKE INT TO VERIFY IF IT IS POSSIBLE TO ADD TELEMETRY DATA TO THE FRAME
+    // IT MUST ALSO CHECK IF THERE IS ALREADY AN INT HEADER IN THE PACKET AND ACT ACCORDINGLY (Should be in the payload)
+    // 
+    // --  Set bit that contains IE List
+    // --  Add termination list 1 IE (2B)
+    // --  Add INT Sub-IE descriptor (2B)
+    // --  Intialize, add or skip ??? ( 1B at least for Subtype ID - variable)
+    // --  Add payload termination IE (2B)
+
     struct tsch_packet *p;
     struct tsch_neighbor *n;
     /* Enqueue packet */
@@ -1197,6 +1221,10 @@ packet_input(void)
 #if TSCH_WITH_SIXTOP
       sixtop_input();
 #endif /* TSCH_WITH_SIXTOP */
+
+#if TSCH_WITH_INT
+      inband_network_telemetry_input();
+#endif
       NETSTACK_NETWORK.input();
     }
   }

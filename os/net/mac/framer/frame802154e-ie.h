@@ -90,6 +90,10 @@ struct ieee802154_ies {
   const uint8_t *sixtop_ie_content_ptr;
   uint16_t sixtop_ie_content_len;
 #endif /* TSCH_WITH_SIXTOP */
+#if TSCH_WITH_INT
+  const uint8_t *int_ie_content_ptr;
+  uint16_t int_ie_content_len;
+#endif
 };
 
 /** Insert various Information Elements **/
@@ -110,6 +114,11 @@ int frame80215e_create_ie_payload_list_termination(uint8_t *buf, int len,
 #if TSCH_WITH_SIXTOP
 /* Payload IE. 6top. Used to nest sub-IEs */
 int frame80215e_create_ie_ietf(uint8_t *buf, int len,
+    struct ieee802154_ies *ies);
+#endif /* TSCH_WITH_SIXTOP */
+#if TSCH_WITH_INT
+/* Payload IE. 6top. Used to nest sub-IEs */
+int frame80215e_create_ie_ietf_int(uint8_t *buf, int len,
     struct ieee802154_ies *ies);
 #endif /* TSCH_WITH_SIXTOP */
 /* Payload IE. MLME. Used to nest sub-IEs */
