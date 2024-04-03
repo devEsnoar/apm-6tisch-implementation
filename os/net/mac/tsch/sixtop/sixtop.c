@@ -59,6 +59,9 @@ const sixtop_sf_t *scheduling_functions[SIXTOP_MAX_SCHEDULING_FUNCTIONS];
 
 const sixtop_sf_t *sixtop_find_sf(uint8_t sfid);
 
+#if TSCH_WITH_INT
+int is_6top_control_message;
+#endif
 /*---------------------------------------------------------------------------*/
 void
 strip_payload_termination_ie(void)
@@ -196,7 +199,12 @@ sixtop_output(const linkaddr_t *dest_addr, mac_callback_t callback, void *arg)
   packetbuf_set_addr(PACKETBUF_ADDR_RECEIVER, dest_addr);
   packetbuf_set_addr(PACKETBUF_ADDR_SENDER, &linkaddr_node_addr);
 
+#if TSCH_WITH_INT
+  is_6top_control_message = 1;
+#endif
+
   NETSTACK_MAC.send(callback, arg);
+
   return 0;
 }
 /*---------------------------------------------------------------------------*/
