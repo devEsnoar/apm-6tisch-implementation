@@ -29,6 +29,7 @@ tools/coffee-manager/coffee.jar
 COOJA.testlog
 simulations/
 .vscode/
+checksum*.txt
 
 # platform build artifacts
 *.cc2538dk
