@@ -20,22 +20,24 @@
  * Larger values result in less frequent active slots: reduces capacity and saves energy. */
 #define TSCH_SCHEDULE_CONF_DEFAULT_LENGTH 3
 
+#define TSCH_CONF_WITH_INT 1
 /*******************************************************/
 /************* Other system configuration **************/
 /*******************************************************/
 
 /* Logging */
-#define LOG_CONF_LEVEL_RPL                         LOG_LEVEL_WARN
-#define LOG_CONF_LEVEL_TCPIP                       LOG_LEVEL_WARN
-#define LOG_CONF_LEVEL_IPV6                        LOG_LEVEL_WARN
-#define LOG_CONF_LEVEL_6LOWPAN                     LOG_LEVEL_WARN
-#define LOG_CONF_LEVEL_MAC                         LOG_LEVEL_NONE
+#define LOG_CONF_LEVEL_RPL                         LOG_LEVEL_DBG
+#define LOG_CONF_LEVEL_TCPIP                       LOG_LEVEL_DBG
+#define LOG_CONF_LEVEL_IPV6                        LOG_LEVEL_DBG
+#define LOG_CONF_LEVEL_6LOWPAN                     LOG_LEVEL_DBG
+#define LOG_CONF_LEVEL_MAC                         LOG_LEVEL_DBG
+#define LOG_CONF_LEVEL_INT                         LOG_LEVEL_DBG
 #define LOG_LEVEL_APP                              LOG_LEVEL_DBG
 /* Do not enable LOG_CONF_LEVEL_FRAMER on SimpleLink,
    that will cause it to print from an interrupt context. */
 #ifndef CONTIKI_TARGET_SIMPLELINK
-#define LOG_CONF_LEVEL_FRAMER                      LOG_LEVEL_WARN
+#define LOG_CONF_LEVEL_FRAMER                      LOG_LEVEL_DBG
 #endif
-#define TSCH_LOG_CONF_PER_SLOT                     0
+#define TSCH_LOG_CONF_PER_SLOT                     1
 
 #endif /* PROJECT_CONF_H_ */
