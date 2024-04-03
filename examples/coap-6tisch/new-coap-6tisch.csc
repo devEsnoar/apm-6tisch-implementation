@@ -2,7 +2,6 @@
 <simconf version="2023090101">
   <simulation>
     <title>new-coap-6tisch</title>
-    <speedlimit>1.0</speedlimit>
     <randomseed>123456</randomseed>
     <motedelay_us>1000000</motedelay_us>
     <radiomedium>
@@ -19,8 +18,7 @@
       org.contikios.cooja.contikimote.ContikiMoteType
       <description>Coap Server</description>
       <source>[CONFIG_DIR]/coap-server/node-server.c</source>
-      <commands>$(MAKE) TARGET=cooja clean
-      $(MAKE) -j$(CPUS) TARGET=cooja node-server.cooja</commands>
+      <commands>$(MAKE) -j$(CPUS) TARGET=cooja node-server.cooja</commands>
       <moteinterface>org.contikios.cooja.interfaces.Position</moteinterface>
       <moteinterface>org.contikios.cooja.interfaces.Battery</moteinterface>
       <moteinterface>org.contikios.cooja.contikimote.interfaces.ContikiVib</moteinterface>
@@ -56,8 +54,7 @@
       org.contikios.cooja.contikimote.ContikiMoteType
       <description>Coap Client</description>
       <source>[CONFIG_DIR]/coap-client/node-client.c</source>
-      <commands>$(MAKE) TARGET=cooja clean
-      $(MAKE) -j$(CPUS) TARGET=cooja node-client.cooja</commands>
+      <commands>$(MAKE) -j$(CPUS) TARGET=cooja node-client.cooja</commands>
       <moteinterface>org.contikios.cooja.interfaces.Position</moteinterface>
       <moteinterface>org.contikios.cooja.interfaces.Battery</moteinterface>
       <moteinterface>org.contikios.cooja.contikimote.interfaces.ContikiVib</moteinterface>
@@ -114,7 +111,7 @@
       <skin>org.contikios.cooja.plugins.skins.UDGMVisualizerSkin</skin>
       <viewport>2.453252034330159 0.0 0.0 2.453252034330159 108.52790920904424 142.33718433445136</viewport>
     </plugin_config>
-    <bounds x="1" y="1" height="400" width="400" z="4" />
+    <bounds x="1" y="1" height="400" width="400" z="6" />
   </plugin>
   <plugin>
     org.contikios.cooja.plugins.LogListener
@@ -123,7 +120,7 @@
       <formatted_time />
       <coloring />
     </plugin_config>
-    <bounds x="397" y="1" height="585" width="1320" z="5" />
+    <bounds x="397" y="1" height="479" width="1320" />
   </plugin>
   <plugin>
     org.contikios.cooja.plugins.TimeLine
@@ -136,7 +133,7 @@
       <showLEDs />
       <zoomfactor>2000.0</zoomfactor>
     </plugin_config>
-    <bounds x="0" y="921" height="166" width="1720" z="1" />
+    <bounds x="0" y="921" height="166" width="1720" z="4" />
   </plugin>
   <plugin>
     org.contikios.cooja.plugins.Notes
@@ -153,7 +150,7 @@
       <interface>Serial port</interface>
       <scrollpos>0,0</scrollpos>
     </plugin_config>
-    <bounds x="18" y="508" height="408" width="568" />
+    <bounds x="18" y="508" height="408" width="568" z="3" />
   </plugin>
   <plugin>
     org.contikios.cooja.plugins.MoteInterfaceViewer
@@ -162,7 +159,7 @@
       <interface>Serial port</interface>
       <scrollpos>0,0</scrollpos>
     </plugin_config>
-    <bounds x="1086" y="504" height="407" width="560" z="3" />
+    <bounds x="1086" y="504" height="407" width="560" z="5" />
   </plugin>
   <plugin>
     org.contikios.cooja.plugins.MoteInterfaceViewer
@@ -172,5 +169,22 @@
       <scrollpos>0,0</scrollpos>
     </plugin_config>
     <bounds x="589" y="506" height="407" width="495" z="2" />
+  </plugin>
+  <plugin>
+    org.contikios.cooja.plugins.RadioLogger
+    <plugin_config>
+      <split>150</split>
+      <formatted_time />
+      <analyzers name="6lowpan" />
+    </plugin_config>
+    <bounds x="105" y="464" height="461" width="624" z="-1" minimized="true" />
+  </plugin>
+  <plugin>
+    org.contikios.cooja.plugins.RadioLogger
+    <plugin_config>
+      <split>150</split>
+      <formatted_time />
+    </plugin_config>
+    <bounds x="70" y="467" height="514" width="1112" z="1" />
   </plugin>
 </simconf>
