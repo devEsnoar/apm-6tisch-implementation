@@ -48,6 +48,12 @@
 #include "contiki-default-conf.h"
 #include "net/routing/routing.h"
 
+#ifdef TSCH_CONF_WITH_INT
+#define TSCH_WITH_INT TSCH_CONF_WITH_INT
+#else
+#define TSCH_WITH_INT 1 
+#endif
+
 /* Log configuration */
 #include "sys/log.h"
 #define LOG_MODULE "ICMPv6"
@@ -57,6 +63,10 @@
 
 /** \brief temporary IP address */
 static uip_ipaddr_t tmp_ipaddr;
+
+#if TSCH_WITH_INT
+int is_rpl_control_message = 0;
+#endif
 
 LIST(echo_reply_callback_list);
 /*---------------------------------------------------------------------------*/
@@ -258,6 +268,10 @@ uip_icmp6_send(const uip_ipaddr_t *dest, int type, int code, int payload_len)
   LOG_INFO("Sending ICMPv6 packet to ");
   LOG_INFO_6ADDR(&UIP_IP_BUF->destipaddr);
   LOG_INFO_(", type %u, code %u, len %u\n", type, code, payload_len);
+
+#if TSCH_WITH_INT
+  is_rpl_control_message = 1;
+#endif
 
   tcpip_ipv6_output();
 }
