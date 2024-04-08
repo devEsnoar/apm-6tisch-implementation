@@ -88,7 +88,7 @@ add_telemetry_entry(void) {
 
 int 
 int_engine_input(const uint8_t * buf, uint16_t len){
-    // uint8_t * buffer = buf;
+    
     LOG_INFO("INT Engine: Input len = %d\n", len);
     struct int_content * temp_int_content = memb_alloc(&int_content_memb);
     if(temp_int_content != NULL) {

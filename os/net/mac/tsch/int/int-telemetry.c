@@ -40,7 +40,6 @@ int input_save_telemetry_data(const uint8_t *buf, struct telemetry_model * telem
     struct int_telemetry * int_telemetry_app = memb_alloc(&app_telemetry_memb);
 
     if(int_telemetry_app != NULL) {
-        // memset(tm_entry_app, 0, sizeof(struct telemetry_model));
         struct telemetry_model * tm_entry_app = &int_telemetry_app->telemetry_data;
         memset(tm_entry_app, 0, sizeof(struct telemetry_model));
         // LOG_DBG("INT Telemetry: telemetry_entry Node ID: %d, Channel and Timestamp: %d, RSSI: %d\n", telemetry_entry->node_id, telemetry_entry->channel_and_timestamp, telemetry_entry->rssi);

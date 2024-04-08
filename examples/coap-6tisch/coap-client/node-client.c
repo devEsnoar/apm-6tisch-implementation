@@ -93,7 +93,10 @@ PROCESS_THREAD(er_example_client, ev, data)
     if(etimer_expired(&et)) {
 
       #if CONTIKI_TARGET_COOJA || CONTIKI_TARGET_Z1
-        if(node_id == 4) { /* Coordinator node. */
+        if(node_id == 4) 
+      #endif
+        {
+      
             if(rpl_is_reachable()) {
             printf("--- Sending data ---\n");
 
@@ -114,7 +117,6 @@ PROCESS_THREAD(er_example_client, ev, data)
 
           }
         }
-      #endif
       struct telemetry_model tm_entry;
       memset(&tm_entry, 0, sizeof(struct telemetry_model));
       {
