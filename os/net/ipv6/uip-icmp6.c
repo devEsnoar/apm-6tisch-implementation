@@ -48,6 +48,7 @@
 #include "contiki-default-conf.h"
 #include "net/routing/routing.h"
 
+// TODO: This is located in multiple parts of the code. Change!
 #ifdef TSCH_CONF_WITH_INT
 #define TSCH_WITH_INT TSCH_CONF_WITH_INT
 #else
