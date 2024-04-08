@@ -1,4 +1,18 @@
 #ifndef _INT_CONF_H_
 #define _INT_CONF_H_
 
+#ifdef INT_CONF_MAX_TELEMETRY_ENTRIES
+#define INT_MAX_TELEMETRY_ENTRIES
+#else
+#define INT_MAX_TELEMETRY_ENTRIES 16
+#endif
+
+#ifdef INT_MAX_CONTENT_ENTRIES
+#define INT_MAX_CONTENT_ENTRIES
+#else
+#define INT_MAX_CONTENT_ENTRIES 1
+#endif
+
+#define INT_SUBIE_ID 0xCA
+
 #endif
