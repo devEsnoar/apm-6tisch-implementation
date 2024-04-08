@@ -1085,6 +1085,10 @@ tsch_init(void)
   sixtop_init();
 #endif
 
+#if TSCH_WITH_INT
+  inband_network_telemetry_init();
+#endif 
+
   tsch_stats_init();
   tsch_roots_init();
 }
@@ -1148,15 +1152,6 @@ send_packet(mac_callback_t sent, void *ptr)
     LOG_ERR("! can't send packet due to framer error\n");
     ret = MAC_TX_ERR;
   } else {
-
-    // AFTER CREATING FRAME, INVOKE INT TO VERIFY IF IT IS POSSIBLE TO ADD TELEMETRY DATA TO THE FRAME
-    // IT MUST ALSO CHECK IF THERE IS ALREADY AN INT HEADER IN THE PACKET AND ACT ACCORDINGLY (Should be in the payload)
-    // 
-    // --  Set bit that contains IE List
-    // --  Add termination list 1 IE (2B)
-    // --  Add INT Sub-IE descriptor (2B)
-    // --  Intialize, add or skip ??? ( 1B at least for Subtype ID - variable)
-    // --  Add payload termination IE (2B)
 
     struct tsch_packet *p;
     struct tsch_neighbor *n;

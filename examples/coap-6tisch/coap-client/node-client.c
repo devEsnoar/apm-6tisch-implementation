@@ -11,6 +11,7 @@
 #include "net/routing/routing.h"
 #include "net/routing/rpl-lite/rpl.h"
 #include "os/lib/random.h"
+#include "net/mac/tsch/int/int-telemetry.h"
 
 #include "contiki-net.h"
 #include "coap-engine.h"
@@ -83,29 +84,44 @@ PROCESS_THREAD(er_example_client, ev, data)
   static coap_message_t request[1];      /* This way the packet can be treated as pointer as usual. */
 
   coap_endpoint_parse(SERVER_EP, strlen(SERVER_EP), &server_ep);
+
+  
   etimer_set(&et, TOGGLE_INTERVAL * CLOCK_SECOND);
   while(1) {
     PROCESS_YIELD();
 
     if(etimer_expired(&et)) {
-      if(rpl_is_reachable()) {
-        printf("--- Sending data ---\n");
 
-        /* prepare request, TID is set by COAP_BLOCKING_REQUEST() */
-        coap_init_message(request, COAP_TYPE_CON, COAP_POST, 0);
-        coap_set_header_uri_path(request, service_urls[1]);
+      #if CONTIKI_TARGET_COOJA || CONTIKI_TARGET_Z1
+        if(node_id == 4) { /* Coordinator node. */
+            if(rpl_is_reachable()) {
+            printf("--- Sending data ---\n");
 
-        short unsigned int random = random_rand();
-        printf("--- Sending > %d\n", random);
-        coap_set_payload(request, (uint8_t *)&random, sizeof(short unsigned int));
+            /* prepare request, TID is set by COAP_BLOCKING_REQUEST() */
+            coap_init_message(request, COAP_TYPE_CON, COAP_POST, 0);
+            coap_set_header_uri_path(request, service_urls[1]);
 
-        LOG_INFO_COAP_EP(&server_ep);
-        LOG_INFO_("\n");
+            short unsigned int random = random_rand();
+            printf("--- Sending > %d\n", random);
+            coap_set_payload(request, (uint8_t *)&random, sizeof(short unsigned int));
 
-        COAP_BLOCKING_REQUEST(&server_ep, request, client_chunk_handler);
+            LOG_INFO_COAP_EP(&server_ep);
+            LOG_INFO_("\n");
 
-        printf("\n--Done--\n");
+            COAP_BLOCKING_REQUEST(&server_ep, request, client_chunk_handler);
 
+            printf("\n--Done--\n");
+
+          }
+        }
+      #endif
+      struct telemetry_model tm_entry;
+      memset(&tm_entry, 0, sizeof(struct telemetry_model));
+      {
+        while(!app_get_last_telemetry_entry(&tm_entry)){
+          
+        }
+        PRINTF("Consuming telemetry: Nothing else in list\n");
       }
       
       etimer_reset(&et);

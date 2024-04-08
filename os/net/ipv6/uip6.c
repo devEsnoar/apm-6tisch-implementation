@@ -94,6 +94,19 @@
 struct uip_stats uip_stat;
 #endif /* UIP_STATISTICS == 1 */
 
+// TODO: This is located in multiple parts of the code. Change!
+#ifdef TSCH_CONF_WITH_INT
+#define TSCH_WITH_INT TSCH_CONF_WITH_INT
+#else
+#define TSCH_WITH_INT 1 
+#endif
+
+
+#if TSCH_WITH_INT
+int is_source_appdata = 0;
+#include "net/mac/tsch/int/int-engine.h"
+#endif
+
 /*---------------------------------------------------------------------------*/
 /**
  * \name Layer 2 variables
@@ -1605,6 +1618,10 @@ uip_process(uint8_t flag)
 
   udp_found:
   LOG_DBG("In udp_found\n");
+#if TSCH_WITH_INT
+  is_source_appdata = 0;
+  remove_int_contents();
+#endif
   UIP_STAT(++uip_stat.udp.recv);
 
   uip_len = uip_len - UIP_IPUDPH_LEN;
@@ -1623,6 +1640,9 @@ uip_process(uint8_t flag)
   }
   uip_len = uip_slen + UIP_IPUDPH_LEN;
 
+#if TSCH_WITH_INT
+  is_source_appdata = 1;
+#endif
   /* For IPv6, the IP length field does not include the IPv6 IP header
      length. */
   uipbuf_set_len_field(UIP_IP_BUF, uip_len - UIP_IPH_LEN);

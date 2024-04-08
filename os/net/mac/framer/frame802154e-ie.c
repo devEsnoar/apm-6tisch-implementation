@@ -83,7 +83,7 @@ enum ieee802154e_mlme_long_subie_id {
 };
 
 #include <net/mac/tsch/sixtop/sixtop.h>
-#include <net/mac/tsch/int/int.h>
+#include <net/mac/tsch/int/int-conf.h>
 enum ieee802154e_ietf_subie_id {
   IETF_IE_6TOP = SIXTOP_SUBIE_ID,
   IETF_IE_INT  = INT_SUBIE_ID,

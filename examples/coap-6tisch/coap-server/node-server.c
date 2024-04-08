@@ -12,6 +12,8 @@
 #include "net/mac/tsch/tsch.h"
 #include "net/routing/routing.h"
 
+#include "net/mac/tsch/int/int-telemetry.h"
+
 #define DEBUG DEBUG_PRINT
 #include "net/ipv6/uip-debug.h"
 
@@ -55,24 +57,29 @@ PROCESS_THREAD(er_example_server, ev, data)
   coap_activate_resource(&res_hello, "test/hello");
   coap_activate_resource(&res_send_dummy, "send/dummy");
 
-
-  
-#if WITH_PERIODIC_ROUTES_PRINT
-  static struct etimer et;
-  /* Print out routing tables every minute */
-  etimer_set(&et, CLOCK_SECOND * 60);
+  static struct etimer telemetry_et;
+  etimer_set(&telemetry_et, CLOCK_SECOND * 30);
+  PRINTF("Timer activated\n");
   while(1) {
-    /* Used for non-regression testing */
-    #if (UIP_MAX_ROUTES != 0)
-      PRINTF("Routing entries: %u\n", uip_ds6_route_num_routes());
-    #endif
-    #if (UIP_SR_LINK_NUM != 0)
-      PRINTF("Routing links: %u\n", uip_sr_num_nodes());
-    #endif
-    PROCESS_YIELD_UNTIL(etimer_expired(&et));
-    etimer_reset(&et);
+    PROCESS_YIELD();
+    
+    if(etimer_expired(&telemetry_et)){
+      PRINTF("Timer expired\n");
+      struct telemetry_model tm_entry;
+      memset(&tm_entry, 0, sizeof(struct telemetry_model));
+      {
+        while(!app_get_last_telemetry_entry(&tm_entry)){
+          uint16_t channel = (tm_entry.channel_and_timestamp & 0xF000) >> 12;
+          uint16_t timestamp = (tm_entry.channel_and_timestamp & 0x0FFF);
+          PRINTF("Consuming telemetry: Node ID: %d, Channel and timestamp: %d, %d, RSSI: %d\n", tm_entry.node_id, channel, timestamp, (int8_t) tm_entry.rssi);
+        }
+        PRINTF("Consuming telemetry: Nothing else in list\n");
+      }
+      etimer_reset(&telemetry_et);
+    }
+      
+    
   }
-#endif /* WITH_PERIODIC_ROUTES_PRINT */
 
   PROCESS_END();
 }
