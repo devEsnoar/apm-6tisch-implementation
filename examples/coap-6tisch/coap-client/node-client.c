@@ -50,6 +50,8 @@ static struct etimer et;
 char *service_urls[NUMBER_OF_URLS] =
 { ".well-known/core", "/send/dummy", "/test/hello" };
 
+static int not_reached = 1;
+
 /* This function is will be passed to COAP_BLOCKING_REQUEST() to handle responses. */
 void
 client_chunk_handler(coap_message_t *response)
@@ -93,27 +95,31 @@ PROCESS_THREAD(er_example_client, ev, data)
     if(etimer_expired(&et)) {
 
       #if CONTIKI_TARGET_COOJA || CONTIKI_TARGET_Z1
-        if(node_id == 4) 
+        if(node_id == 3) 
       #endif
         {
       
             if(rpl_is_reachable()) {
-            printf("--- Sending data ---\n");
+              if(not_reached) { 
+                printf("### Joined the network ###\n");
+                not_reached = 0;
+              }
+              printf("--- Sending data ---\n");
 
-            /* prepare request, TID is set by COAP_BLOCKING_REQUEST() */
-            coap_init_message(request, COAP_TYPE_CON, COAP_POST, 0);
-            coap_set_header_uri_path(request, service_urls[1]);
+              /* prepare request, TID is set by COAP_BLOCKING_REQUEST() */
+              coap_init_message(request, COAP_TYPE_CON, COAP_POST, 0);
+              coap_set_header_uri_path(request, service_urls[1]);
 
-            short unsigned int random = random_rand();
-            printf("--- Sending > %d\n", random);
-            coap_set_payload(request, (uint8_t *)&random, sizeof(short unsigned int));
+              short unsigned int random = random_rand();
+              printf("--- Sending > %d\n", random);
+              coap_set_payload(request, (uint8_t *)&random, sizeof(short unsigned int));
 
-            LOG_INFO_COAP_EP(&server_ep);
-            LOG_INFO_("\n");
+              LOG_INFO_COAP_EP(&server_ep);
+              LOG_INFO_("\n");
 
-            COAP_BLOCKING_REQUEST(&server_ep, request, client_chunk_handler);
+              COAP_BLOCKING_REQUEST(&server_ep, request, client_chunk_handler);
 
-            printf("\n--Done--\n");
+              printf("\n--Done--\n");
 
           }
         }

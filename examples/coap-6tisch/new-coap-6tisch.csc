@@ -100,26 +100,6 @@
           <history>ping fd00::201:1:1:1~;log main 0~;log mac 0~;ping fd00::201:1:1:1~;log mac 0~;ping fd00::201:1:1:1~;log mac 2~;ping fd00::201:1:1:1~;fd00::203:3:3:3~;log mac 2~;ping fd00::201:1:1:1~;log mac 2~;ping fd00::201:1:1:1~;help~;</history>
         </interface_config>
       </mote>
-      <mote>
-        <interface_config>
-          org.contikios.cooja.interfaces.Position
-          <pos x="76.40757164018477" y="96.23508131455321" />
-        </interface_config>
-        <interface_config>
-          org.contikios.cooja.contikimote.interfaces.ContikiMoteID
-          <id>4</id>
-        </interface_config>
-      </mote>
-      <mote>
-        <interface_config>
-          org.contikios.cooja.interfaces.Position
-          <pos x="62.6476237904634" y="62.465712789800804" />
-        </interface_config>
-        <interface_config>
-          org.contikios.cooja.contikimote.interfaces.ContikiMoteID
-          <id>5</id>
-        </interface_config>
-      </mote>
     </motetype>
   </simulation>
   <plugin>
@@ -149,8 +129,6 @@
       <mote>0</mote>
       <mote>1</mote>
       <mote>2</mote>
-      <mote>3</mote>
-      <mote>4</mote>
       <showRadioRXTX />
       <showRadioHW />
       <showLEDs />

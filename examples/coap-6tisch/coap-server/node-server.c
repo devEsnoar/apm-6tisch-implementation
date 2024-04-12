@@ -52,7 +52,7 @@ PROCESS_THREAD(er_example_server, ev, data)
 
   PROCESS_PAUSE();
 
-  LOG_INFO("Starting Coap-6TiSCH Example Server\n");
+  LOG_INFO("Starting Coap-6TiSCH Server - INT\n");
 
   coap_activate_resource(&res_hello, "test/hello");
   coap_activate_resource(&res_send_dummy, "send/dummy");
