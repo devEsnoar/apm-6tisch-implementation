@@ -20,7 +20,7 @@
  * Larger values result in less frequent active slots: reduces capacity and saves energy. */
 #define TSCH_SCHEDULE_CONF_DEFAULT_LENGTH 3
 
-#define TSCH_CONF_WITH_INT 1
+#include "../common-conf.h"
 
 /*******************************************************/
 /************* Other system configuration **************/
@@ -32,7 +32,7 @@
 #define LOG_CONF_LEVEL_IPV6                        LOG_LEVEL_WARN
 #define LOG_CONF_LEVEL_6LOWPAN                     LOG_LEVEL_WARN
 #define LOG_CONF_LEVEL_MAC                         LOG_LEVEL_WARN
-#define LOG_LEVEL_APP                              LOG_LEVEL_WARN
+#define LOG_LEVEL_APP                              LOG_LEVEL_INFO
 #define LOG_CONF_LEVEL_INT                         LOG_LEVEL_INFO
 /* Do not enable LOG_CONF_LEVEL_FRAMER on SimpleLink,
    that will cause it to print from an interrupt context. */

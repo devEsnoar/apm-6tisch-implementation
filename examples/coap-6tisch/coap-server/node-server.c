@@ -9,10 +9,10 @@
 #include "sys/log.h"
 #include "net/ipv6/uip-ds6-route.h"
 #include "net/ipv6/uip-sr.h"
+#include "net/mac/tsch/int/int-telemetry.h"
 #include "net/mac/tsch/tsch.h"
 #include "net/routing/routing.h"
-
-#include "net/mac/tsch/int/int-telemetry.h"
+#include "project-conf.h"
 
 #define DEBUG DEBUG_PRINT
 #include "net/ipv6/uip-debug.h"
@@ -69,9 +69,22 @@ PROCESS_THREAD(er_example_server, ev, data)
       memset(&tm_entry, 0, sizeof(struct telemetry_model));
       {
         while(!app_get_last_telemetry_entry(&tm_entry)){
+
+          #if INT_CONF_TELEMETRY_EXPERIMENT
+          char buf[20];
+          snprintf(buf, sizeof(buf), "%d", tm_entry.dummy_data[0]);
+          for (int i = 1; i < INT_CONF_TELEMETRY_EXPERIMENT_SIZE; ++i) {
+            snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%d", tm_entry.dummy_data[i]);
+          }
+          snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "\n");
+          PRINTF("EXPERIMENT: Consumed %d Bytes of telemetry: %s", INT_CONF_TELEMETRY_EXPERIMENT_SIZE, buf);
+          #else
           uint16_t channel = (tm_entry.channel_and_timestamp & 0xF000) >> 12;
           uint16_t timestamp = (tm_entry.channel_and_timestamp & 0x0FFF);
           PRINTF("Consuming telemetry: Node ID: %d, Channel and timestamp: %d, %d, RSSI: %d\n", tm_entry.node_id, channel, timestamp, (int8_t) tm_entry.rssi);
+          #endif
+        
+          
         }
         PRINTF("Consuming telemetry: Nothing else in list\n");
       }

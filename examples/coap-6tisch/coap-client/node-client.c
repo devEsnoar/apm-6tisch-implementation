@@ -123,7 +123,7 @@ PROCESS_THREAD(er_example_client, ev, data)
         while(!app_get_last_telemetry_entry(&tm_entry)){
           
         }
-        PRINTF("Consuming telemetry: Nothing else in list\n");
+        // PRINTF("Consuming telemetry: Nothing else in list\n");
       }
       
       etimer_reset(&et);
