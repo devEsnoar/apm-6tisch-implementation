@@ -167,7 +167,7 @@ int radio_lqi_last(void)
 static int
 radio_on(void)
 {
-  ENERGEST_ON(ENERGEST_TYPE_LISTEN);
+  // ENERGEST_ON(ENERGEST_TYPE_LISTEN);
   simRadioHWOn = 1;
   return 1;
 }
@@ -175,7 +175,7 @@ radio_on(void)
 static int
 radio_off(void)
 {
-  ENERGEST_OFF(ENERGEST_TYPE_LISTEN);
+  // ENERGEST_OFF(ENERGEST_TYPE_LISTEN);
   simRadioHWOn = 0;
   return 1;
 }

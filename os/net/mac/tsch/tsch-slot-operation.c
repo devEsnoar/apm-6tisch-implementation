@@ -53,6 +53,7 @@
 #include "net/mac/framer/framer-802154.h"
 #include "net/mac/tsch/tsch.h"
 #include "sys/critical.h"
+#include "sys/energest.h"
 
 #include "sys/log.h"
 /* TSCH debug macros, i.e. to set LEDs or GPIOs on various TSCH
@@ -645,6 +646,9 @@ PT_THREAD(tsch_tx_slot(struct pt *pt, struct rtimer *t))
                   tsch_timing[tsch_ts_tx_offset] + tx_duration + tsch_timing[tsch_ts_rx_ack_delay] - RADIO_DELAY_BEFORE_RX, "TxBeforeAck");
               TSCH_DEBUG_TX_EVENT();
               tsch_radio_on(TSCH_RADIO_CMD_ON_WITHIN_TIMESLOT);
+
+              ENERGEST_ON(ENERGEST_TYPE_CUSTOM_LISTEN);
+
               /* Wait for ACK to come */
               RTIMER_BUSYWAIT_UNTIL_ABS(NETSTACK_RADIO.receiving_packet(),
                   tx_start_time, tx_duration + tsch_timing[tsch_ts_rx_ack_delay] + tsch_timing[tsch_ts_ack_wait] + RADIO_DELAY_BEFORE_DETECT);
@@ -657,6 +661,7 @@ PT_THREAD(tsch_tx_slot(struct pt *pt, struct rtimer *t))
                                  ack_start_time, tsch_timing[tsch_ts_max_ack]);
               TSCH_DEBUG_TX_EVENT();
               tsch_radio_off(TSCH_RADIO_CMD_OFF_WITHIN_TIMESLOT);
+              ENERGEST_OFF(ENERGEST_TYPE_CUSTOM_LISTEN);
 
 #if TSCH_HW_FRAME_FILTERING
               /* Leaving promiscuous mode */
@@ -842,6 +847,7 @@ PT_THREAD(tsch_rx_slot(struct pt *pt, struct rtimer *t))
       /* no packets on air */
       tsch_radio_off(TSCH_RADIO_CMD_OFF_FORCE);
     } else {
+      ENERGEST_ON(ENERGEST_TYPE_CUSTOM_LISTEN);
       TSCH_DEBUG_RX_EVENT();
       /* Save packet timestamp */
       rx_start_time = RTIMER_NOW() - RADIO_DELAY_BEFORE_DETECT;
@@ -851,6 +857,7 @@ PT_THREAD(tsch_rx_slot(struct pt *pt, struct rtimer *t))
           current_slot_start, tsch_timing[tsch_ts_rx_offset] + tsch_timing[tsch_ts_rx_wait] + tsch_timing[tsch_ts_max_tx]);
       TSCH_DEBUG_RX_EVENT();
       tsch_radio_off(TSCH_RADIO_CMD_OFF_WITHIN_TIMESLOT);
+      ENERGEST_OFF(ENERGEST_TYPE_CUSTOM_LISTEN);
 
       if(NETSTACK_RADIO.pending_packet()) {
         static int frame_valid;

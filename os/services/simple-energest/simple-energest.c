@@ -84,16 +84,16 @@ simple_energest_step(void)
   curr_lpm = energest_type_time(ENERGEST_TYPE_LPM);
   curr_deep_lpm = energest_type_time(ENERGEST_TYPE_DEEP_LPM);
   curr_tx = energest_type_time(ENERGEST_TYPE_TRANSMIT);
-  curr_rx = energest_type_time(ENERGEST_TYPE_LISTEN);
+  curr_rx = energest_type_time(ENERGEST_TYPE_CUSTOM_LISTEN);
 
   delta_time = MAX(curr_time - last_time, 1);
 
-  LOG_INFO("--- Period summary #%u (%"PRIu64" seconds)\n",
+  LOG_INFO("=== Period summary #%u (%"PRIu64" seconds)\n",
            count++, delta_time / ENERGEST_SECOND);
   LOG_INFO("Total time  : %10"PRIu64"\n", delta_time);
-  log_energest("CPU", curr_cpu - last_cpu, delta_time);
-  log_energest("LPM", curr_lpm - last_lpm, delta_time);
-  log_energest("Deep LPM", curr_deep_lpm - last_deep_lpm, delta_time);
+  // log_energest("CPU", curr_cpu - last_cpu, delta_time);
+  // log_energest("LPM", curr_lpm - last_lpm, delta_time);
+  // log_energest("Deep LPM", curr_deep_lpm - last_deep_lpm, delta_time);
   log_energest("Radio Tx", curr_tx - last_tx, delta_time);
   log_energest("Radio Rx", curr_rx - last_rx, delta_time);
   log_energest("Radio total", curr_tx - last_tx + curr_rx - last_rx,
@@ -129,7 +129,7 @@ simple_energest_init(void)
   last_cpu = energest_type_time(ENERGEST_TYPE_CPU);
   last_lpm = energest_type_time(ENERGEST_TYPE_LPM);
   last_deep_lpm = energest_type_time(ENERGEST_TYPE_DEEP_LPM);
-  last_tx = energest_type_time(ENERGEST_TYPE_TRANSMIT);
+  last_tx = energest_type_time(ENERGEST_TYPE_CUSTOM_LISTEN);
   last_rx = energest_type_time(ENERGEST_TYPE_LISTEN);
   process_start(&simple_energest_process, NULL);
 }
