@@ -190,4 +190,8 @@
 ##### "INT_CONF_TELEMETRY_EXPERIMENT_SIZE": ____ -> INT_TELEMETRY_EXPERIMENT_SIZE
 #endif
 
+#ifdef TSCH_CONF_WITH_INT
 ##### "TSCH_CONF_WITH_INT": ____________________ == TSCH_CONF_WITH_INT
+#else
+##### "TSCH_CONF_WITH_INT": ____________________ -> TSCH_WITH_INT
+#endif

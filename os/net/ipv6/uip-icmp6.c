@@ -48,12 +48,6 @@
 #include "contiki-default-conf.h"
 #include "net/routing/routing.h"
 
-// TODO: This is located in multiple parts of the code. Change!
-#ifdef TSCH_CONF_WITH_INT
-#define TSCH_WITH_INT TSCH_CONF_WITH_INT
-#else
-#define TSCH_WITH_INT 1 
-#endif
 
 /* Log configuration */
 #include "sys/log.h"
@@ -65,7 +59,7 @@
 /** \brief temporary IP address */
 static uip_ipaddr_t tmp_ipaddr;
 
-#if TSCH_WITH_INT
+#if TSCH_CONF_WITH_INT
 int is_rpl_control_message = 0;
 #endif
 
@@ -270,7 +264,7 @@ uip_icmp6_send(const uip_ipaddr_t *dest, int type, int code, int payload_len)
   LOG_INFO_6ADDR(&UIP_IP_BUF->destipaddr);
   LOG_INFO_(", type %u, code %u, len %u\n", type, code, payload_len);
 
-#if TSCH_WITH_INT
+#if TSCH_CONF_WITH_INT
   is_rpl_control_message = 1;
 #endif
 

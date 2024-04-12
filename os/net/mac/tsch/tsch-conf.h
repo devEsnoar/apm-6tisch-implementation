@@ -364,7 +364,7 @@
 #ifdef TSCH_CONF_WITH_INT
 #define TSCH_WITH_INT TSCH_CONF_WITH_INT
 #else
-#define TSCH_WITH_INT 1
+#define TSCH_WITH_INT 0
 #endif
 
 /* A custom feature allowing upper layers to assign packets to
