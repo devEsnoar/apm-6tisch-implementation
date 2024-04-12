@@ -21,6 +21,8 @@ static struct int_content * int_contents = NULL;
 
 const int INT_SIZE_OVERHEAD = 7;
 
+#define MAX_PAYLOAD_LEN_INT (127 - 2)
+
 
 extern int is_source_appdata;
 
@@ -150,15 +152,22 @@ int_engine_output(){
     if(int_contents != NULL) {
         LOG_DBG("INT Engine: INT already present, read when received\n");
         int current_tm_entries_size = (TELEMETRY_MODEL_SIZE * list_length(int_contents->int_telemetry_list));
-        if(required_size_initialize >= PACKETBUF_SIZE) {
-            LOG_WARN("INT Engine: Not enough space for intializing present INT, must be removed, max = %d, current_len = %d, needed = %d\n", PACKETBUF_SIZE, total_packet_len, required_size_initialize );
+        LOG_INFO("INT Engine: pkt size (%d) + int_init (%d) + int_current (%d) + new_entry (%d) = %d\n", 
+                            total_packet_len, 
+                            hdr_size + INT_SIZE_OVERHEAD, 
+                            current_tm_entries_size, 
+                            new_entry_size, 
+                            current_tm_entries_size + hdr_size + INT_SIZE_OVERHEAD + total_packet_len + new_entry_size);
+
+        if(required_size_initialize >= MAX_PAYLOAD_LEN_INT) {
+            LOG_WARN("INT Engine: Not enough space for intializing present INT, must be removed, max = %d, current_len = %d, needed = %d\n", MAX_PAYLOAD_LEN_INT, total_packet_len, required_size_initialize );
             
             return 0;
         }
         else {
             LOG_DBG("INT Engine: Enough space to keep intialization hdr\n");
             int required_size = current_tm_entries_size + required_size_initialize;
-            if (required_size >= PACKETBUF_SIZE) {
+            if (required_size >= MAX_PAYLOAD_LEN_INT) {
                 LOG_WARN("INT Engine: No current space for INT entries, must be removed but hdr stays\n");
                 remove_int_telemetry_entries(int_contents);
                 int_contents->int_current_header.int_control = INT_HDR_CONTROL_OVERFLOW_MASK & 0xFF;
@@ -166,12 +175,12 @@ int_engine_output(){
             }
             else {
                 if(int_contents->int_current_header.int_control & INT_HDR_CONTROL_OVERFLOW_MASK ||
-                    required_size + new_entry_size >= PACKETBUF_SIZE) {
-                    LOG_WARN("INT Engine: INT stays as it was received, no space for new entry\n");
+                    required_size + new_entry_size >= MAX_PAYLOAD_LEN_INT) {
+                    LOG_WARN("INT Engine: INT stays as it was received, no space for new entry: req %d + new %d >= max %d\n", required_size, new_entry_size, MAX_PAYLOAD_LEN_INT);
                     return 0;
                 }
                 else {
-                    LOG_DBG("INT Engine: Add new entry based on present bitmap\n");
+                    LOG_DBG("INT Engine: Add new entry based on present bitmap: req %d + new %d >= max %d\n", required_size, new_entry_size, MAX_PAYLOAD_LEN_INT);
                     return add_telemetry_entry();
                 }
 
@@ -184,8 +193,8 @@ int_engine_output(){
         // INT was not initialized, the node can initialize the transmission
 
         // Can we at least initialize?
-        if(required_size_initialize >= PACKETBUF_SIZE) {
-            LOG_WARN("INT Engine: Not enough space for intializing INT, max = %d, current_len = %d, needed = %d\n", PACKETBUF_SIZE, total_packet_len, required_size_initialize );
+        if(required_size_initialize >= MAX_PAYLOAD_LEN_INT) {
+            LOG_WARN("INT Engine: Not enough space for intializing INT, max = %d, current_len = %d, needed = %d\n", MAX_PAYLOAD_LEN_INT, total_packet_len, required_size_initialize );
             return 0;
         }
         else {
@@ -202,8 +211,14 @@ int_engine_output(){
 
                 // Can we also add a new entry?
                 int required_size_newentry = required_size_initialize + new_entry_size;
-                if (required_size_newentry >= PACKETBUF_SIZE) {
-                    LOG_WARN("INT Engine: Not enough space for adding INT entry, max = %d, current_len = %d, needed = %d\n", PACKETBUF_SIZE, total_packet_len, required_size_newentry);
+                LOG_INFO("INT Engine: pkt size (%d) + int_init (%d) + new_entry (%d) = %d\n", 
+                                total_packet_len, 
+                                hdr_size + INT_SIZE_OVERHEAD, 
+                                new_entry_size,
+                                total_packet_len + hdr_size + INT_SIZE_OVERHEAD + new_entry_size);
+
+                if (required_size_newentry >= MAX_PAYLOAD_LEN_INT) {
+                    LOG_WARN("INT Engine: Not enough space for adding INT entry, max = %d, current_len = %d, needed = %d\n", MAX_PAYLOAD_LEN_INT, total_packet_len, required_size_newentry);
                     // Set overflow bit
                     int_contents->int_current_header.int_control = INT_HDR_CONTROL_OVERFLOW_MASK & 0xFF;
                     return 0;

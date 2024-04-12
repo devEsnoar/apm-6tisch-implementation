@@ -1,4 +1,4 @@
-#include "int-telemetry.h"
+
 #include "net/netstack.h"
 #include "sys/log.h"
 #include "lib/list.h"
@@ -9,12 +9,15 @@
 #define LOG_LEVEL LOG_LEVEL_INT
 
 #include "lib/memb.h"
+#include "int-telemetry.h"
 
 extern int is_source_appdata;
 extern struct tsch_asn_t tsch_current_asn;
 extern uint8_t tsch_current_channel;
 
 MEMB(app_telemetry_memb, struct int_telemetry, 256);
+
+
 
 LIST(app_telemetry_list);
 
@@ -24,7 +27,10 @@ void telemetry_init(void){
 }
 
 int input_save_telemetry_data(const uint8_t *buf, struct telemetry_model * telemetry_entry) {
-
+    
+    #if INT_TELEMETRY_EXPERIMENT
+    memcpy(&telemetry_entry->dummy_data, buf, TELEMETRY_MODEL_SIZE);
+    #else
     telemetry_entry->node_id = buf[0] + (buf[1] << 8);
     uint8_t channel = buf[3] >> 4;
     telemetry_entry->channel_and_timestamp = (!channel) ? (tsch_current_channel << 12) + (buf[2] + (buf[3] << 8)) :  buf[2] + (buf[3] << 8);
@@ -36,15 +42,21 @@ int input_save_telemetry_data(const uint8_t *buf, struct telemetry_model * telem
         telemetry_entry->channel_and_timestamp & 0x0FFF, 
         telemetry_entry->rssi
     );
+    #endif
+
+
 
     struct int_telemetry * int_telemetry_app = memb_alloc(&app_telemetry_memb);
 
     if(int_telemetry_app != NULL) {
         struct telemetry_model * tm_entry_app = &int_telemetry_app->telemetry_data;
         memset(tm_entry_app, 0, sizeof(struct telemetry_model));
+        #if INT_TELEMETRY_EXPERIMENT
+        #else
         // LOG_DBG("INT Telemetry: telemetry_entry Node ID: %d, Channel and Timestamp: %d, RSSI: %d\n", telemetry_entry->node_id, telemetry_entry->channel_and_timestamp, telemetry_entry->rssi);
         // LOG_INFO("INT Telemetry: tm_entry_app Node ID: %d, Channel and Timestamp: %d, RSSI: %d\n", tm_entry_app->node_id, tm_entry_app->channel_and_timestamp, tm_entry_app->rssi);
         // memcpy(tm_entry_app, telemetry_entry, sizeof(struct telemetry_model));
+        #endif
         *tm_entry_app = *telemetry_entry;
         list_push(app_telemetry_list, int_telemetry_app);
         LOG_DBG("INT Telemetry: Telemetry entry saved for app consumption\n");
@@ -57,6 +69,20 @@ int input_save_telemetry_data(const uint8_t *buf, struct telemetry_model * telem
     return 0;
 }
 
+#if INT_TELEMETRY_EXPERIMENT
+int create_telemetry_entry(struct telemetry_model * telemetry_entry, uint8_t bitmap){
+    
+    uint8_t buffer[TELEMETRY_MODEL_SIZE];
+    for(int i = 0; i < TELEMETRY_MODEL_SIZE; i++){
+        buffer[i] = (uint8_t) node_id;
+    }
+    if(bitmap){
+        memcpy(&telemetry_entry->dummy_data, buffer, TELEMETRY_MODEL_SIZE);
+    }
+    return 0;
+
+}
+#else
 int create_telemetry_entry(struct telemetry_model * telemetry_entry, uint8_t bitmap){
     // TODO: Implement bitmap verification
     radio_value_t radio_last_rssi;
@@ -84,6 +110,7 @@ int create_telemetry_entry(struct telemetry_model * telemetry_entry, uint8_t bit
     return 0;
 
 }
+#endif
 
 int app_get_last_telemetry_entry(struct telemetry_model * tm_data){
     struct int_telemetry * int_telemetry_app = list_chop(app_telemetry_list);
