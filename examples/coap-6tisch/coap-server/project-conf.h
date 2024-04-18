@@ -33,7 +33,7 @@
 #define LOG_CONF_LEVEL_6LOWPAN                     LOG_LEVEL_WARN
 #define LOG_CONF_LEVEL_MAC                         LOG_LEVEL_WARN
 #define LOG_LEVEL_APP                              LOG_LEVEL_INFO
-#define LOG_CONF_LEVEL_INT                         LOG_LEVEL_INFO
+#define LOG_CONF_LEVEL_INT                         LOG_LEVEL_WARN
 /* Do not enable LOG_CONF_LEVEL_FRAMER on SimpleLink,
    that will cause it to print from an interrupt context. */
 #ifndef CONTIKI_TARGET_SIMPLELINK

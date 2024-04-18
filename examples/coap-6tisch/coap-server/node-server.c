@@ -77,7 +77,7 @@ PROCESS_THREAD(er_example_server, ev, data)
             snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%d", tm_entry.dummy_data[i]);
           }
           snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "\n");
-          PRINTF("EXPERIMENT: Consumed %d Bytes of telemetry: %s", INT_CONF_TELEMETRY_EXPERIMENT_SIZE, buf);
+          // PRINTF("EXPERIMENT: Consumed %d Bytes of telemetry: %s", INT_CONF_TELEMETRY_EXPERIMENT_SIZE, buf);
           #else
           uint16_t channel = (tm_entry.channel_and_timestamp & 0xF000) >> 12;
           uint16_t timestamp = (tm_entry.channel_and_timestamp & 0x0FFF);

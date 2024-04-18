@@ -87,7 +87,6 @@ PROCESS_THREAD(er_example_client, ev, data)
 
   coap_endpoint_parse(SERVER_EP, strlen(SERVER_EP), &server_ep);
 
-  
   etimer_set(&et, TOGGLE_INTERVAL * CLOCK_SECOND);
   while(1) {
     PROCESS_YIELD();
@@ -105,7 +104,7 @@ PROCESS_THREAD(er_example_client, ev, data)
               /* prepare request, TID is set by COAP_BLOCKING_REQUEST() */
               coap_init_message(request, COAP_TYPE_CON, COAP_POST, 0);
               coap_set_header_uri_path(request, service_urls[1]);
-
+              
               char buf[INT_CONF_TELEMETRY_EXPERIMENT_SIZE];
               for(int i = 0; i < INT_CONF_TELEMETRY_EXPERIMENT_SIZE; i++) {
                 buf[i] = (uint8_t) node_id;
