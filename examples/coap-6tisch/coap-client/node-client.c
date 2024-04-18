@@ -109,8 +109,8 @@ PROCESS_THREAD(er_example_client, ev, data)
               coap_init_message(request, COAP_TYPE_CON, COAP_POST, 0);
               coap_set_header_uri_path(request, service_urls[1]);
 
-              char dummy[3] = {'T','E','\0'};
-              printf("--- Sending > %s\n", dummy);
+              char dummy[2] = {'D', 'A'};
+              printf("--- Sending > %.*s\n", 2, dummy);
               coap_set_payload(request, dummy, sizeof(dummy));
 
               LOG_INFO_COAP_EP(&server_ep);
