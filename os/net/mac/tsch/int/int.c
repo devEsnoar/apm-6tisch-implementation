@@ -5,6 +5,7 @@
 #include "stdio.h"
 #include "net/packetbuf.h"
 #include "net/netstack.h"
+#include "net/routing/routing.h"
 #include "net/mac/framer/framer-802154.h"
 #include "net/mac/framer/frame802154e-ie.h"
 #include "lib/assert.h"
@@ -27,8 +28,7 @@ int inband_network_telemetry_output(void)
 {
 
   LOG_INFO("INT Output: In-Band Network Telemetry Output\n");
-
-  if(!is_rpl_control_message && !packetbuf_holds_broadcast() && (received_int || is_source_appdata)
+  if(!is_rpl_control_message && !packetbuf_holds_broadcast() && ((received_int || is_source_appdata) && !NETSTACK_ROUTING.node_is_root())
 #if TSCH_WITH_6TOP
 		&& !is_6top_control_message
 #endif
