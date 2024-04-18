@@ -69,7 +69,7 @@ uint8_t *coap_databuf(void);
  * \param len  The size of the data to send
  * \return     The number of bytes sent or negative if an error occurred.
  */
-int coap_sendto(const coap_endpoint_t *ep, const uint8_t *data, uint16_t len);
+int coap_sendto(const coap_endpoint_t *ep, uint8_t *data, uint16_t len);
 
 /**
  * \brief      Initialize the CoAP transport.

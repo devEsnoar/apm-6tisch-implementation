@@ -47,6 +47,7 @@
  */
 
 #include "contiki.h"
+#include "sys/node-id.h"
 #include "net/ipv6/uip-udp-packet.h"
 #include "net/ipv6/uiplib.h"
 #include "net/routing/routing.h"
@@ -58,6 +59,8 @@
 #include "coap-constants.h"
 #include "coap-keystore.h"
 #include "coap-keystore-simple.h"
+#include "net/netstack.h"
+#include "routing/routing.h"
 
 /* Log configuration */
 #include "coap-log.h"
@@ -362,11 +365,31 @@ process_data(void)
   LOG_INFO_("]:%u\n", uip_ntohs(UIP_UDP_BUF->srcport));
   LOG_INFO("  Length: %u\n", uip_datalen());
 
-  coap_receive(get_src_endpoint(0), uip_appdata, uip_datalen());
+  int length = uip_datalen();
+  uint8_t * buf_app = uip_appdata;
+
+  
+
+  #if COAP_WITH_PIGGYBACKING
+  if(NETSTACK_ROUTING.node_is_root()){
+    if(length + COAP_TELEMETRY_SIZE <= COAP_MAX_CHUNK_SIZE){
+      uint8_t telemetry_data[COAP_TELEMETRY_SIZE];
+      LOG_WARN("EXPERIMENT: Consumed %d Bytes of telemetry ", COAP_TELEMETRY_SIZE);
+      for(int i = 0; i < COAP_TELEMETRY_SIZE; i++){
+        telemetry_data[i] = *(buf_app + length - COAP_TELEMETRY_SIZE + i);
+        LOG_WARN_("%d",  telemetry_data[i]);
+      }
+      LOG_WARN_(" \n");
+      length -= COAP_TELEMETRY_SIZE;
+    }
+  }
+  #endif
+
+  coap_receive(get_src_endpoint(0), uip_appdata, length);
 }
 /*---------------------------------------------------------------------------*/
 int
-coap_sendto(const coap_endpoint_t *ep, const uint8_t *data, uint16_t length)
+coap_sendto(const coap_endpoint_t *ep, uint8_t *data, uint16_t length)
 {
   if(ep == NULL) {
     LOG_WARN("failed to send - no endpoint\n");
@@ -400,6 +423,23 @@ coap_sendto(const coap_endpoint_t *ep, const uint8_t *data, uint16_t length)
     }
   }
 #endif /* WITH_DTLS */
+
+// Assumption: Server node is always the root. There is only one server node in then network.
+#if COAP_WITH_PIGGYBACKING
+  if(!NETSTACK_ROUTING.node_is_root()){
+    if(length + COAP_TELEMETRY_SIZE <= COAP_MAX_CHUNK_SIZE){
+      LOG_DBG("CoAP Piggybacking: Enough space to embed telemetry\n");
+      for(int i = 0; i < COAP_TELEMETRY_SIZE; i++){
+        data[length + i] = (uint8_t) node_id;
+        LOG_DBG("CoAP Piggybacking: Embedding byte into CoAP Payload %0x \n", (char) data[length+i]);
+      }
+      length += COAP_TELEMETRY_SIZE;
+    }
+    else {
+      LOG_WARN("CoAP Piggybacking: Not enough space to embed telemetry\n");
+    }
+  }
+#endif
 
   uip_udp_packet_sendto(udp_conn, data, length, &ep->ipaddr, ep->port);
   LOG_INFO("sent to ");
