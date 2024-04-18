@@ -59,9 +59,11 @@ res_post_handler(coap_message_t *request, coap_message_t *response, uint8_t *buf
 {
   
   const uint8_t *payload = NULL;
-  if(coap_get_payload(request, &payload) > 0) {
-    uint16_t received_short = ((uint16_t)payload[1] << 8) | payload[0];
-    printf("Variable value: %d\n",  received_short);
+  int received_size;
+  if( (received_size = coap_get_payload(request, &payload)) > 0) {
+      printf("Received %d bytes App Data: ", received_size);
+      printf("%s", payload);
+      printf("\n");
   }
 }
 

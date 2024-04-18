@@ -30,7 +30,11 @@ int input_save_telemetry_data(const uint8_t *buf, struct telemetry_model * telem
     
     #if INT_TELEMETRY_EXPERIMENT
     memcpy(&telemetry_entry->dummy_data, buf, TELEMETRY_MODEL_SIZE);
-    LOG_WARN("EXPERIMENT: Consumed %d Bytes of telemetry\n", TELEMETRY_MODEL_SIZE);
+    LOG_WARN("EXPERIMENT: Consumed %d Bytes of telemetry ", TELEMETRY_MODEL_SIZE);
+    for(int i = 0; i < TELEMETRY_MODEL_SIZE; i++){
+        LOG_WARN_("%d",  buf[i]);
+    }
+    LOG_WARN_(" \n");
     #else
     telemetry_entry->node_id = buf[0] + (buf[1] << 8);
     uint8_t channel = buf[3] >> 4;

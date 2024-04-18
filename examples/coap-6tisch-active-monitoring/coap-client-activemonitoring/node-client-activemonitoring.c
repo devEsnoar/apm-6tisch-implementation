@@ -36,13 +36,17 @@
 #define SERVER_EP "coap://[fd00::f6ce:36a2:9c50:4687]"
 #endif
 
-#define TOGGLE_INTERVAL 5
+#define TOGGLE_INTERVAL 10
+#define MONITORING_TOGGLE_INTERVAL 7
 
+#define INT_CONF_TELEMETRY_EXPERIMENT_SIZE 2
 /*---------------------------------------------------------------------------*/
 PROCESS(er_example_client, "Coap-6TiSCH Example Client");
 AUTOSTART_PROCESSES(&er_example_client);
 
 static struct etimer et;
+static struct etimer monitoring_et;
+static struct etimer offset;
 
 /* Example URIs that can be queried. */
 #define NUMBER_OF_URLS 3
@@ -87,7 +91,12 @@ PROCESS_THREAD(er_example_client, ev, data)
 
   coap_endpoint_parse(SERVER_EP, strlen(SERVER_EP), &server_ep);
 
+  etimer_set(&offset, (node_id-1) * CLOCK_SECOND);
+  PROCESS_YIELD_UNTIL(etimer_expired(&offset));
+
+
   etimer_set(&et, TOGGLE_INTERVAL * CLOCK_SECOND);
+  etimer_set(&monitoring_et, MONITORING_TOGGLE_INTERVAL * CLOCK_SECOND);
   while(1) {
     PROCESS_YIELD();
 
@@ -101,16 +110,12 @@ PROCESS_THREAD(er_example_client, ev, data)
               }
               printf("--- Sending data ---\n");
 
-              /* prepare request, TID is set by COAP_BLOCKING_REQUEST() */
               coap_init_message(request, COAP_TYPE_CON, COAP_POST, 0);
               coap_set_header_uri_path(request, service_urls[1]);
-              
-              char buf[INT_CONF_TELEMETRY_EXPERIMENT_SIZE];
-              for(int i = 0; i < INT_CONF_TELEMETRY_EXPERIMENT_SIZE; i++) {
-                buf[i] = (uint8_t) node_id;
-              }
 
-              coap_set_payload(request, buf, INT_CONF_TELEMETRY_EXPERIMENT_SIZE);
+              char dummy[3] = {'D', 'A', '\0'};
+              printf("--- Sending > %s\n", dummy);
+              coap_set_payload(request, dummy, sizeof(dummy));
 
               LOG_INFO_COAP_EP(&server_ep);
               LOG_INFO_("\n");
@@ -118,35 +123,39 @@ PROCESS_THREAD(er_example_client, ev, data)
               COAP_BLOCKING_REQUEST(&server_ep, request, client_chunk_handler);
 
               printf("\n--Done--\n");
-
+              /* prepare request, TID is set by COAP_BLOCKING_REQUEST() */
           }
         }      
       etimer_reset(&et);
+    }
 
-#if PLATFORM_HAS_BUTTON
-#if PLATFORM_SUPPORTS_BUTTON_HAL
-    } else if(ev == button_hal_release_event) {
-#else
-    } else if(ev == sensors_event && data == &button_sensor) {
-#endif
+    if(etimer_expired(&monitoring_et)) {
+      if(rpl_is_reachable()){
+        printf("--- Sending monitoring data ---\n");
 
-      /* send a request to notify the end of the process */
+          coap_init_message(request, COAP_TYPE_CON, COAP_POST, 0);
+          coap_set_header_uri_path(request, service_urls[1]);
+          
+          char buf[INT_CONF_TELEMETRY_EXPERIMENT_SIZE];
+          printf("--- Sending > ");
+          for(int i = 0; i < INT_CONF_TELEMETRY_EXPERIMENT_SIZE; i++) {
+            printf("%d", node_id);
+            buf[i] = (uint8_t) node_id;
+          }
+          printf("\n");
 
-      coap_init_message(request, COAP_TYPE_CON, COAP_GET, 0);
-      coap_set_header_uri_path(request, service_urls[2]);
+          coap_set_payload(request, buf, INT_CONF_TELEMETRY_EXPERIMENT_SIZE);
 
-      printf("--Requesting %s--\n", service_urls[2]);
+          LOG_INFO_COAP_EP(&server_ep);
+          LOG_INFO_("\n");
 
-      LOG_INFO_COAP_EP(&server_ep);
-      LOG_INFO_("\n");
+          COAP_BLOCKING_REQUEST(&server_ep, request, client_chunk_handler);
 
-      COAP_BLOCKING_REQUEST(&server_ep, request,
-                            client_chunk_handler);
+          printf("\n-- Done Sending Monitoring Data  --\n");
 
-      printf("\n--Done--\n");
 
-      // uri_switch = (uri_switch + 1) % NUMBER_OF_URLS;
-#endif /* PLATFORM_HAS_BUTTON */
+      }
+      etimer_reset(&monitoring_et);
     }
   }
 

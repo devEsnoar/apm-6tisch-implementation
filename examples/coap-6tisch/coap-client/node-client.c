@@ -10,7 +10,6 @@
 #include "net/mac/tsch/tsch.h"
 #include "net/routing/routing.h"
 #include "net/routing/rpl-lite/rpl.h"
-#include "os/lib/random.h"
 #include "net/mac/tsch/int/int-telemetry.h"
 
 #include "contiki-net.h"
@@ -36,13 +35,14 @@
 #define SERVER_EP "coap://[fd00::f6ce:36a2:9c50:4687]"
 #endif
 
-#define TOGGLE_INTERVAL 5
+#define TOGGLE_INTERVAL 10
 
 /*---------------------------------------------------------------------------*/
 PROCESS(er_example_client, "Coap-6TiSCH Example Client");
 AUTOSTART_PROCESSES(&er_example_client);
 
 static struct etimer et;
+static struct etimer offset; 
 
 /* Example URIs that can be queried. */
 #define NUMBER_OF_URLS 3
@@ -81,22 +81,21 @@ PROCESS_THREAD(er_example_client, ev, data)
 #endif
   NETSTACK_MAC.on();
 
-  random_init(0);
-
   static coap_message_t request[1];      /* This way the packet can be treated as pointer as usual. */
 
   coap_endpoint_parse(SERVER_EP, strlen(SERVER_EP), &server_ep);
 
+
   
+  etimer_set(&offset, (node_id-1) * CLOCK_SECOND);
+  PROCESS_YIELD_UNTIL(etimer_expired(&offset));
+
   etimer_set(&et, TOGGLE_INTERVAL * CLOCK_SECOND);
   while(1) {
     PROCESS_YIELD();
 
     if(etimer_expired(&et)) {
 
-      #if CONTIKI_TARGET_COOJA || CONTIKI_TARGET_Z1
-        if(node_id == 3) 
-      #endif
         {
       
             if(rpl_is_reachable()) {
@@ -110,9 +109,9 @@ PROCESS_THREAD(er_example_client, ev, data)
               coap_init_message(request, COAP_TYPE_CON, COAP_POST, 0);
               coap_set_header_uri_path(request, service_urls[1]);
 
-              short unsigned int random = random_rand();
-              printf("--- Sending > %d\n", random);
-              coap_set_payload(request, (uint8_t *)&random, sizeof(short unsigned int));
+              char dummy[3] = {'T','E','\0'};
+              printf("--- Sending > %s\n", dummy);
+              coap_set_payload(request, dummy, sizeof(dummy));
 
               LOG_INFO_COAP_EP(&server_ep);
               LOG_INFO_("\n");
@@ -133,31 +132,6 @@ PROCESS_THREAD(er_example_client, ev, data)
       }
       
       etimer_reset(&et);
-
-#if PLATFORM_HAS_BUTTON
-#if PLATFORM_SUPPORTS_BUTTON_HAL
-    } else if(ev == button_hal_release_event) {
-#else
-    } else if(ev == sensors_event && data == &button_sensor) {
-#endif
-
-      /* send a request to notify the end of the process */
-
-      coap_init_message(request, COAP_TYPE_CON, COAP_GET, 0);
-      coap_set_header_uri_path(request, service_urls[2]);
-
-      printf("--Requesting %s--\n", service_urls[2]);
-
-      LOG_INFO_COAP_EP(&server_ep);
-      LOG_INFO_("\n");
-
-      COAP_BLOCKING_REQUEST(&server_ep, request,
-                            client_chunk_handler);
-
-      printf("\n--Done--\n");
-
-      // uri_switch = (uri_switch + 1) % NUMBER_OF_URLS;
-#endif /* PLATFORM_HAS_BUTTON */
     }
   }
 
