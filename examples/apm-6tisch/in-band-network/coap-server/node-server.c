@@ -32,7 +32,7 @@ extern coap_resource_t
   res_send_dummy;
 
 
-PROCESS(er_example_server, "Coap-6TiSCH Example Server");
+PROCESS(er_example_server, "Server | APM-6TiSCH INT");
 AUTOSTART_PROCESSES(&er_example_server);
 
 /*---------------------------------------------------------------------------*/

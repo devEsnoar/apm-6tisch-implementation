@@ -31,7 +31,7 @@ extern coap_resource_t
   res_send_dummy;
 
 
-PROCESS(er_example_server, "Coap-6TiSCH Example Server");
+PROCESS(er_example_server, "Server | APM-6TiSCH Piggybacking");
 AUTOSTART_PROCESSES(&er_example_server);
 
 /*---------------------------------------------------------------------------*/
@@ -50,8 +50,6 @@ PROCESS_THREAD(er_example_server, ev, data)
   NETSTACK_MAC.on();
 
   PROCESS_PAUSE();
-
-  LOG_INFO("Starting Coap-6TiSCH Server - Active Monitoring\n");
 
   coap_activate_resource(&res_hello, "test/hello");
   coap_activate_resource(&res_send_dummy, "send/dummy");

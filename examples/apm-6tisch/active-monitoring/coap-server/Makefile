@@ -1,9 +1,10 @@
-CONTIKI_PROJECT = node-client
+CONTIKI_PROJECT = node-server
 all: $(CONTIKI_PROJECT)
 
-CONTIKI=../../..
+CONTIKI=../../../..
 
 MAKE_MAC = MAKE_MAC_TSCH
+MODULES_REL += ./resources
 
 include $(CONTIKI)/Makefile.dir-variables
 include $(CONTIKI)/Makefile.identify-target
