@@ -29,12 +29,13 @@
 
 #define MONITORING_TOGGLE_INTERVAL 7
 
-#define INT_CONF_TELEMETRY_EXPERIMENT_SIZE 2
+#define INT_CONF_TELEMETRY_EXPERIMENT_SIZE 4
 /*---------------------------------------------------------------------------*/
 PROCESS(er_example_client, "Client | APM-6TiSCH Active Monitoring");
 AUTOSTART_PROCESSES(&er_example_client);
 
 static struct etimer monitoring_et;
+static struct etimer offset;
 
 /* Example URIs that can be queried. */
 #define NUMBER_OF_URLS 3
@@ -70,12 +71,15 @@ PROCESS_THREAD(er_example_client, ev, data)
   }
 #endif
   NETSTACK_MAC.on();
-
+  
   app_trafic_generator_init();
 
   static coap_message_t request[1];      /* This way the packet can be treated as pointer as usual. */
 
   coap_endpoint_parse(SERVER_EP, strlen(SERVER_EP), &server_ep);
+  
+  etimer_set(&offset, (node_id-1) * CLOCK_SECOND);
+  PROCESS_YIELD_UNTIL(etimer_expired(&offset));
 
   etimer_set(&monitoring_et, MONITORING_TOGGLE_INTERVAL * CLOCK_SECOND);
   while(1) {
