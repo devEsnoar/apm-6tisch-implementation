@@ -265,7 +265,7 @@ int embed_int_in_frame() {
         p = packetbuf_hdrptr();
         LOG_DBG("INT Engine: Payload Termination 1 has been added\n");
 
-        int allocation_size = 1 + INT_HEADER_SIZE + (TELEMETRY_MODEL_SIZE * list_length(int_contents->int_telemetry_list));
+        int allocation_size = INT_HEADER_SIZE + (TELEMETRY_MODEL_SIZE * list_length(int_contents->int_telemetry_list));
         packetbuf_hdralloc(allocation_size);
         p = packetbuf_hdrptr();
         *(p++) = int_contents->int_current_header.int_subtype;
