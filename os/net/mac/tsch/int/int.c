@@ -39,7 +39,7 @@ int inband_network_telemetry_output(void)
       ret = 0;
     }
     else{
-      LOG_ERR("INT: int_engine_output() and/or embed_int_in_frame() failed");
+      LOG_ERR("INT: int_engine_output() and/or embed_int_in_frame() failed\n");
       ret = 1;
     }
     is_source_appdata = 0;

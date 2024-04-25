@@ -159,23 +159,23 @@ int_engine_output(){
                             new_entry_size, 
                             current_tm_entries_size + hdr_size + INT_SIZE_OVERHEAD + total_packet_len + new_entry_size);
 
-        if(required_size_initialize >= MAX_PAYLOAD_LEN_INT) {
+        if(required_size_initialize > MAX_PAYLOAD_LEN_INT) {
             LOG_WARN("INT Engine: Not enough space for intializing present INT, must be removed, max = %d, current_len = %d, needed = %d\n", MAX_PAYLOAD_LEN_INT, total_packet_len, required_size_initialize );
-            
+            remove_int_contents();
             return 0;
         }
         else {
             LOG_DBG("INT Engine: Enough space to keep intialization hdr\n");
             int required_size = current_tm_entries_size + required_size_initialize;
-            if (required_size >= MAX_PAYLOAD_LEN_INT) {
+            if (required_size > MAX_PAYLOAD_LEN_INT) {
                 LOG_WARN("INT Engine: No current space for INT entries, must be removed but hdr stays\n");
-                remove_int_telemetry_entries(int_contents);
-                int_contents->int_current_header.int_control = INT_HDR_CONTROL_OVERFLOW_MASK & 0xFF;
+                remove_int_telemetry_entries(int_contents); 
+                // int_contents->int_current_header.int_control = INT_HDR_CONTROL_OVERFLOW_MASK & 0xFF;
                 return 0;
             }
             else {
                 if(int_contents->int_current_header.int_control & INT_HDR_CONTROL_OVERFLOW_MASK ||
-                    required_size + new_entry_size >= MAX_PAYLOAD_LEN_INT) {
+                    required_size + new_entry_size > MAX_PAYLOAD_LEN_INT) {
                     LOG_WARN("INT Engine: INT stays as it was received, no space for new entry: req %d + new %d >= max %d\n", required_size, new_entry_size, MAX_PAYLOAD_LEN_INT);
                     return 0;
                 }
@@ -193,7 +193,7 @@ int_engine_output(){
         // INT was not initialized, the node can initialize the transmission
 
         // Can we at least initialize?
-        if(required_size_initialize >= MAX_PAYLOAD_LEN_INT) {
+        if(required_size_initialize > MAX_PAYLOAD_LEN_INT) {
             LOG_WARN("INT Engine: Not enough space for intializing INT, max = %d, current_len = %d, needed = %d\n", MAX_PAYLOAD_LEN_INT, total_packet_len, required_size_initialize );
             return 0;
         }
@@ -217,7 +217,7 @@ int_engine_output(){
                                 new_entry_size,
                                 total_packet_len + hdr_size + INT_SIZE_OVERHEAD + new_entry_size);
 
-                if (required_size_newentry >= MAX_PAYLOAD_LEN_INT) {
+                if (required_size_newentry > MAX_PAYLOAD_LEN_INT) {
                     LOG_WARN("INT Engine: Not enough space for adding INT entry, max = %d, current_len = %d, needed = %d\n", MAX_PAYLOAD_LEN_INT, total_packet_len, required_size_newentry);
                     // Set overflow bit
                     int_contents->int_current_header.int_control = INT_HDR_CONTROL_OVERFLOW_MASK & 0xFF;
@@ -245,7 +245,7 @@ int embed_int_in_frame() {
     
     if(int_contents == NULL){
         LOG_WARN("INT Engine: No INT to embed. Check previous logs\n");
-        ret = -1;
+        ret = 0;
     }
     else {
         LOG_INFO("INT Engine: INT Contents present, embedding into frame\n");
