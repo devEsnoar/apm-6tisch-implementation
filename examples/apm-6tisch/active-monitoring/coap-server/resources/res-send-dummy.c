@@ -61,7 +61,7 @@ res_post_handler(coap_message_t *request, coap_message_t *response, uint8_t *buf
   const uint8_t *payload = NULL;
   int received_size;
   if( (received_size = coap_get_payload(request, &payload)) > 0) {
-    if(payload[0] != 'D'){
+    if(payload[0] != '&'){
       printf("EXPERIMENT: Consumed %d Bytes of telemetry: ", received_size);
       for (int i = 0; i < received_size; i++) {
           printf("%d", payload[i]);

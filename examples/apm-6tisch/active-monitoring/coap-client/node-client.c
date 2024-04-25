@@ -27,9 +27,9 @@
 #define SERVER_EP "coap://[fd00::f6ce:36a2:9c50:4687]"
 #endif
 
-#define MONITORING_TOGGLE_INTERVAL 7
+#define MONITORING_TOGGLE_INTERVAL 15
 
-#define INT_CONF_TELEMETRY_EXPERIMENT_SIZE 4
+#define INT_CONF_TELEMETRY_EXPERIMENT_SIZE 11
 /*---------------------------------------------------------------------------*/
 PROCESS(er_example_client, "Client | APM-6TiSCH Active Monitoring");
 AUTOSTART_PROCESSES(&er_example_client);
