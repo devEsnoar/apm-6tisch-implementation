@@ -372,16 +372,21 @@ process_data(void)
 
   #if COAP_WITH_PIGGYBACKING
   if(NETSTACK_ROUTING.node_is_root()){
-    if(length + COAP_TELEMETRY_SIZE <= COAP_MAX_CHUNK_SIZE){
+    LOG_WARN("CoAP PB: buf_app: %0X %0X \n", *(buf_app + length - 1), *(buf_app + length - 2));
+    if(*(buf_app + length - 1) == 0xCA && *(buf_app + length - 2) == 0x3F){
       uint8_t telemetry_data[COAP_TELEMETRY_SIZE];
       LOG_WARN("EXPERIMENT: Consumed %d Bytes of telemetry ", COAP_TELEMETRY_SIZE);
       for(int i = 0; i < COAP_TELEMETRY_SIZE; i++){
-        telemetry_data[i] = *(buf_app + length - COAP_TELEMETRY_SIZE + i);
+        telemetry_data[i] = *(buf_app + length - 2 - COAP_TELEMETRY_SIZE + i);
         LOG_WARN_("%d",  telemetry_data[i]);
       }
       LOG_WARN_(" \n");
-      length -= COAP_TELEMETRY_SIZE;
+      length -= COAP_TELEMETRY_SIZE + 2;
     }
+    else{
+      LOG_WARN("CoAP PB: There was not enough space to append telemetry\n");
+    }
+    
   }
   #endif
 
@@ -427,13 +432,15 @@ coap_sendto(const coap_endpoint_t *ep, uint8_t *data, uint16_t length)
 // Assumption: Server node is always the root. There is only one server node in then network.
 #if COAP_WITH_PIGGYBACKING
   if(!NETSTACK_ROUTING.node_is_root()){
-    if(length + COAP_TELEMETRY_SIZE <= COAP_MAX_CHUNK_SIZE){
-      LOG_DBG("CoAP Piggybacking: Enough space to embed telemetry\n");
+    if(length + COAP_TELEMETRY_SIZE + 2 <= COAP_MAX_CHUNK_SIZE){
+      LOG_DBG("CoAP Piggybacking: Enough space to embed telemetry %d <= %d\n", length + COAP_TELEMETRY_SIZE + 2, COAP_MAX_CHUNK_SIZE);
       for(int i = 0; i < COAP_TELEMETRY_SIZE; i++){
         data[length + i] = (uint8_t) node_id;
         LOG_DBG("CoAP Piggybacking: Embedding byte into CoAP Payload %0x \n", (char) data[length+i]);
       }
       length += COAP_TELEMETRY_SIZE;
+      data[length++] = 0x3F;
+      data[length++] = 0xCA;
     }
     else {
       LOG_WARN("CoAP Piggybacking: Not enough space to embed telemetry\n");
