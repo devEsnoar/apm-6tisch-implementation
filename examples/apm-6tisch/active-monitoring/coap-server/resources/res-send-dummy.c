@@ -69,7 +69,7 @@ res_post_handler(coap_message_t *request, coap_message_t *response, uint8_t *buf
       printf("\n");
     }
     else{
-      printf("Received %d bytes App Data: ", received_size);
+      printf("Received %d bytes App Data ", received_size);
       printf("%.*s", received_size, payload);
       printf("\n");
     }
