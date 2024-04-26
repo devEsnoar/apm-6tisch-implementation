@@ -366,12 +366,13 @@ process_data(void)
   LOG_INFO("  Length: %u\n", uip_datalen());
 
   int length = uip_datalen();
-  uint8_t * buf_app = uip_appdata;
+  
 
   
 
   #if COAP_WITH_PIGGYBACKING
   if(NETSTACK_ROUTING.node_is_root()){
+    uint8_t * buf_app = uip_appdata;
     LOG_WARN("CoAP PB: buf_app: %0X %0X \n", *(buf_app + length - 1), *(buf_app + length - 2));
     if(*(buf_app + length - 1) == 0xCA && *(buf_app + length - 2) == 0x3F){
       uint8_t telemetry_data[COAP_TELEMETRY_SIZE];
