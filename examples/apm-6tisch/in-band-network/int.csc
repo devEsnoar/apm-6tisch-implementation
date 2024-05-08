@@ -138,7 +138,7 @@
       <formatted_time />
       <coloring />
     </plugin_config>
-    <bounds x="455" y="4" height="393" width="1187" z="1" />
+    <bounds x="455" y="4" height="393" width="1196" />
   </plugin>
   <plugin>
     org.contikios.cooja.plugins.TimeLine
@@ -162,7 +162,7 @@
       <notes />
       <decorations>true</decorations>
     </plugin_config>
-    <bounds x="11" y="412" height="160" width="1520" z="3" />
+    <bounds x="11" y="412" height="160" width="1520" z="1" />
   </plugin>
   <plugin>
     org.contikios.cooja.plugins.Visualizer
@@ -174,7 +174,7 @@
       <skin>org.contikios.cooja.plugins.skins.UDGMVisualizerSkin</skin>
       <viewport>1.197813474680672 0.0 0.0 1.197813474680672 228.7135812437263 100.36511277992696</viewport>
     </plugin_config>
-    <bounds x="1" y="1" height="400" width="400" z="2" />
+    <bounds x="1" y="1" height="400" width="400" z="3" />
   </plugin>
   <plugin>
     org.contikios.cooja.plugins.RadioLogger
@@ -191,6 +191,6 @@
       <split>150</split>
       <formatted_time />
     </plugin_config>
-    <bounds x="25" y="503" height="386" width="674" />
+    <bounds x="25" y="503" height="386" width="674" z="2" />
   </plugin>
 </simconf>
