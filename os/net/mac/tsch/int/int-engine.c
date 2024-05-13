@@ -250,7 +250,7 @@ int_engine_output(){
                 rpl_instance_t *default_instance = rpl_get_default_instance();
                 uint8_t root_distance = ((default_instance->current_dag->rank - ROOT_RANK(default_instance))/RPL_MIN_HOPRANKINC);
                 #endif
-                if(is_source_appdata && root_distance > 1){ required_size_initialize = MIN(required_size_initialize + 9, MAX_PAYLOAD_LEN_INT); } // Compensation for 6LoWPAN Compression
+                if(is_source_appdata && root_distance > 2){ required_size_initialize = MIN(required_size_initialize + 9, MAX_PAYLOAD_LEN_INT); } // Compensation for 6LoWPAN Compression
                 
                 int required_size_newentry = required_size_initialize + new_entry_size;
                 LOG_INFO("pkt size (%d) + int_init (%d) + new_entry (%d) = %d\n", 
