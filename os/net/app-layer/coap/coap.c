@@ -49,6 +49,7 @@
 #include <stdlib.h>
 #include <inttypes.h>
 #include "sys/cc.h"
+#include "sys/node-id.h"
 #include "lib/random.h"
 
 #include "coap.h"
@@ -387,6 +388,22 @@ coap_serialize_message(coap_message_t *coap_pkt, uint8_t *buffer)
 
   /* Pack payload */
   if((option - coap_pkt->buffer) <= COAP_MAX_HEADER_SIZE) {
+    
+    #if COAP_WITH_PIGGYBACKING
+    if(coap_pkt->type != COAP_TYPE_ACK && coap_pkt->type != COAP_TYPE_RST) {
+      if(coap_pkt->payload_len + COAP_TELEMETRY_SIZE + 2 + 9 <= COAP_MAX_CHUNK_SIZE) { // + 9  to compensate for 6LoWPAN compressions and decompressions
+        LOG_DBG("-Telemetry data fits\n");
+        *option = 0xFA;
+        ++option;
+        *option = COAP_TELEMETRY_SIZE;
+        ++option;
+        for(int i = 0; i < COAP_TELEMETRY_SIZE; i++){
+          *option = (uint8_t) node_id;
+          ++option;
+        }
+      }
+    }
+    #endif
     /* Payload marker */
     if(coap_pkt->payload_len) {
       *option = 0xFF;
@@ -473,6 +490,18 @@ coap_parse_message(coap_message_t *coap_pkt, uint8_t *data, uint16_t data_len)
   while(current_option < data + data_len) {
     /* payload marker 0xFF, currently only checking for 0xF* because rest is reserved */
     if((current_option[0] & 0xF0) == 0xF0) {
+    #if COAP_WITH_PIGGYBACKING
+      if(current_option[0] == 0xFA){
+          uint8_t telemetry_size = current_option[1];
+          LOG_WARN("EXPERIMENT: Consumed %d Bytes of telemetry ", telemetry_size);
+          for(int i = 0; i < telemetry_size; i++){
+            LOG_WARN_("%d",  current_option[2 + i]);
+          }
+          LOG_WARN_(" \n");
+          current_option = current_option + 2 + telemetry_size;
+      }
+    #endif
+    
       coap_pkt->payload = ++current_option;
       coap_pkt->payload_len = data_len - (coap_pkt->payload - data);
 
