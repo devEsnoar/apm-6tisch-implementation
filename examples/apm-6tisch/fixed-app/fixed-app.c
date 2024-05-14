@@ -25,6 +25,8 @@
 #define LOG_MODULE "App"
 #define LOG_LEVEL  LOG_LEVEL_APP
 
+#define SIZE  6
+const int payload_sizes[SIZE]  = {10, 20, 30, 40, 45, 50};
 
 /* Example URIs that can be queried. */
 #define NUMBER_OF_URLS 3
@@ -38,7 +40,6 @@ static struct etimer et;
 static struct etimer offset; 
 
 PROCESS(er_fixed_app_traffic, "APM-6TiSCH - App Traffic Generator");
-
 
 static uint8_t app_data_buffer[APP_DATA_BUFFER_SIZE];
 
@@ -93,7 +94,7 @@ PROCESS_THREAD(er_fixed_app_traffic, ev, data)
               coap_init_message(request, COAP_TYPE_CON, COAP_POST, 0);
               coap_set_header_uri_path(request, service_urls[1]);     
 
-              len = ((random_rand() % APP_DATA_RAND_RANGE)  + APP_DATA_LEN_MIN) * APP_DATA_LEN_MULTIPLIER;
+              len = payload_sizes[random_rand() % SIZE];
               fill_app_data_buffer(len);
               printf("--- Sending > %.*s\n", len, app_data_buffer);
               coap_set_payload(request, app_data_buffer, len);
