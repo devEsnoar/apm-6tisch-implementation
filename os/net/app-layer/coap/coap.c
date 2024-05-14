@@ -391,7 +391,7 @@ coap_serialize_message(coap_message_t *coap_pkt, uint8_t *buffer)
     
     #if COAP_WITH_PIGGYBACKING
     if(coap_pkt->type != COAP_TYPE_ACK && coap_pkt->type != COAP_TYPE_RST) {
-      if(coap_pkt->payload_len + COAP_TELEMETRY_SIZE + 2 + 9 <= COAP_MAX_CHUNK_SIZE) { // + 9  to compensate for 6LoWPAN compressions and decompressions
+      if(coap_pkt->payload_len + COAP_TELEMETRY_SIZE + 2 + 11 <= COAP_MAX_CHUNK_SIZE) { // + 11  to compensate for 6LoWPAN compressions and decompressions
         LOG_DBG("-Telemetry data fits\n");
         *option = 0xFA;
         ++option;
