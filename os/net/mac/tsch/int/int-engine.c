@@ -15,6 +15,10 @@
 #include "rpl-private.h"
 #endif
 
+#if INT_TELEMETRY_COUNTER
+#include "os/services/telemetry/telemetry-counter.h"
+#endif 
+
 #include "sys/log.h"
 #define LOG_MODULE "INT Engine"
 #define LOG_LEVEL LOG_LEVEL_INT
@@ -281,6 +285,9 @@ int_engine_output(){
                     #endif
                     {
                         LOG_WARN("Add new entry based on new bitmap\n");
+                        #if INT_TELEMETRY_COUNTER
+                        increment_counter(INT_TELEMETRY_EXPERIMENT_SIZE);
+                        #endif
                         return add_telemetry_entry();
                     }
                 }

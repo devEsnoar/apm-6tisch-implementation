@@ -76,7 +76,8 @@
 struct tsch_log_t {
   enum { tsch_log_tx,
          tsch_log_rx,
-         tsch_log_message
+         tsch_log_message,
+         tsch_log_especial
   } type;
   struct tsch_asn_t asn;
   struct tsch_link *link;

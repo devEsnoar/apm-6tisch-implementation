@@ -14,11 +14,17 @@
 #define LOG_MODULE "INT"
 #define LOG_LEVEL LOG_LEVEL_INT
 
+
 extern int is_rpl_control_message;
 
 #if TSCH_WITH_6TOP
 extern int is_6top_control_message;
 #endif
+
+#if INT_ACTIVE_MONITORING
+extern int is_am_message;
+#endif
+
 
 extern int INT_SIZE_OVERHEAD;
 extern int is_source_appdata;
@@ -29,6 +35,9 @@ int inband_network_telemetry_output(void)
 
   LOG_INFO("INT Output: In-Band Network Telemetry Output\n");
   if(!is_rpl_control_message && !packetbuf_holds_broadcast() && ((received_int || is_source_appdata) && !NETSTACK_ROUTING.node_is_root())
+#if INT_ACTIVE_MONITORING
+    && !is_am_message
+#endif
 #if TSCH_WITH_6TOP
 		&& !is_6top_control_message
 #endif
@@ -51,10 +60,12 @@ int inband_network_telemetry_output(void)
   }
 
   is_rpl_control_message = 0;
+#if INT_ACTIVE_MONITORING
+  is_am_message = 0;
+#endif
 #if TSCH_WITH_6TOP
   is_6top_control_message = 0;
 #endif
-
 	return 0;
 }
 

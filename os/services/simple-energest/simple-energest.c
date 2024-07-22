@@ -130,7 +130,7 @@ simple_energest_init(void)
   last_lpm = energest_type_time(ENERGEST_TYPE_LPM);
   last_deep_lpm = energest_type_time(ENERGEST_TYPE_DEEP_LPM);
   last_tx = energest_type_time(ENERGEST_TYPE_CUSTOM_LISTEN);
-  last_rx = energest_type_time(ENERGEST_TYPE_LISTEN);
+  last_rx = energest_type_time(ENERGEST_TYPE_TRANSMIT);
   process_start(&simple_energest_process, NULL);
 }
 

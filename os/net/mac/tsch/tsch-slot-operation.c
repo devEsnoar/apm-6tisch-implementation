@@ -616,6 +616,9 @@ PT_THREAD(tsch_tx_slot(struct pt *pt, struct rtimer *t))
           /* send packet already in radio tx buffer */
           mac_tx_status = NETSTACK_RADIO.transmit(packet_len);
           tx_count++;
+
+          TSCH_LOG_ADD(tsch_log_especial,
+            snprintf(log->message, sizeof(log->message), "Especial: tx op, %u bytes", packet_len))
           /* Save tx timestamp */
           tx_start_time = current_slot_start + tsch_timing[tsch_ts_tx_offset];
           /* calculate TX duration based on sent packet len */
@@ -671,7 +674,8 @@ PT_THREAD(tsch_tx_slot(struct pt *pt, struct rtimer *t))
 
               /* Read ack frame */
               ack_len = NETSTACK_RADIO.read((void *)ackbuf, sizeof(ackbuf));
-
+              TSCH_LOG_ADD(tsch_log_especial,
+                  snprintf(log->message, sizeof(log->message), "Especial: rx op, %u bytes", ack_len))
               is_time_source = 0;
               /* The radio driver should return 0 if no valid packets are in the rx buffer */
               if(ack_len > 0) {
@@ -868,7 +872,10 @@ PT_THREAD(tsch_rx_slot(struct pt *pt, struct rtimer *t))
 
         /* Read packet */
         current_input->len = NETSTACK_RADIO.read((void *)current_input->payload, TSCH_PACKET_MAX_LEN);
+        TSCH_LOG_ADD(tsch_log_especial,
+          snprintf(log->message, sizeof(log->message), "Especial: rx op, %u bytes", current_input->len))
         NETSTACK_RADIO.get_value(RADIO_PARAM_LAST_RSSI, &radio_last_rssi);
+        
         current_input->rx_asn = tsch_current_asn;
         current_input->rssi = (signed)radio_last_rssi;
         current_input->channel = tsch_current_channel;

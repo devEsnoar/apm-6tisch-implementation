@@ -29,7 +29,7 @@
 
 #define MONITORING_TOGGLE_INTERVAL 15
 
-#define INT_CONF_TELEMETRY_EXPERIMENT_SIZE 11
+#define INT_CONF_TELEMETRY_EXPERIMENT_SIZE 19
 /*---------------------------------------------------------------------------*/
 PROCESS(er_example_client, "Client | APM-6TiSCH Active Monitoring");
 AUTOSTART_PROCESSES(&er_example_client);

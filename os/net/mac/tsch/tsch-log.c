@@ -79,46 +79,51 @@ tsch_log_process_pending(void)
   }
   while((log_index = ringbufindex_peek_get(&log_ringbuf)) != -1) {
     struct tsch_log_t *log = &log_array[log_index];
-    if(log->link == NULL) {
-      printf("[INFO: TSCH-LOG  ] {asn %02x.%08"PRIx32" link-NULL} ", log->asn.ms1b, log->asn.ls4b);
-    } else {
-      struct tsch_slotframe *sf = tsch_schedule_get_slotframe_by_handle(log->link->slotframe_handle);
-      printf("[INFO: TSCH-LOG  ] {asn %02x.%08"PRIx32" link %2u %3u %3u %2u %2u ch %2u} ",
-             log->asn.ms1b, log->asn.ls4b,
-             log->link->slotframe_handle, sf ? sf->size.val : 0,
-             log->burst_count, log->link->timeslot + log->burst_count, log->channel_offset,
-             log->channel);
-    }
+    // if(log->link == NULL) {
+    //   printf("[INFO: TSCH-LOG  ] {asn %02x.%08"PRIx32" link-NULL} ", log->asn.ms1b, log->asn.ls4b);
+    // } else {
+    //   struct tsch_slotframe *sf = tsch_schedule_get_slotframe_by_handle(log->link->slotframe_handle);
+    //   printf("[INFO: TSCH-LOG  ] {asn %02x.%08"PRIx32" link %2u %3u %3u %2u %2u ch %2u} ",
+    //          log->asn.ms1b, log->asn.ls4b,
+    //          log->link->slotframe_handle, sf ? sf->size.val : 0,
+    //          log->burst_count, log->link->timeslot + log->burst_count, log->channel_offset,
+    //          log->channel);
+    // }
     switch(log->type) {
       case tsch_log_tx:
-        printf("%s-%u-%u tx ",
-                linkaddr_cmp(&log->tx.dest, &linkaddr_null) ? "bc" : "uc", log->tx.is_data, log->tx.sec_level);
-        log_lladdr_compact(&linkaddr_node_addr);
-        printf("->");
-        log_lladdr_compact(&log->tx.dest);
-        printf(", len %3u, seq %3u, st %d %2d",
-                log->tx.datalen, log->tx.seqno, log->tx.mac_tx_status, log->tx.num_tx);
-        if(log->tx.drift_used) {
-          printf(", dr %3d", log->tx.drift);
-        }
-        printf("\n");
         break;
+        // printf("%s-%u-%u tx ",
+        //         linkaddr_cmp(&log->tx.dest, &linkaddr_null) ? "bc" : "uc", log->tx.is_data, log->tx.sec_level);
+        // log_lladdr_compact(&linkaddr_node_addr);
+        // printf("->");
+        // log_lladdr_compact(&log->tx.dest);
+        // printf(", len %3u, seq %3u, st %d %2d",
+        //         log->tx.datalen, log->tx.seqno, log->tx.mac_tx_status, log->tx.num_tx);
+        // if(log->tx.drift_used) {
+        //   printf(", dr %3d", log->tx.drift);
+        // }
+        // printf("\n");
+        // break;
       case tsch_log_rx:
-        printf("%s-%u-%u rx ",
-                log->rx.is_unicast == 0 ? "bc" : "uc", log->rx.is_data, log->rx.sec_level);
-        log_lladdr_compact(&log->rx.src);
-        printf("->");
-        log_lladdr_compact(log->rx.is_unicast ? &linkaddr_node_addr : NULL);
-        printf(", len %3u, seq %3u",
-                log->rx.datalen, log->rx.seqno);
-        printf(", edr %3d", (int)log->rx.estimated_drift);
-        if(log->rx.drift_used) {
-          printf(", dr %3d\n", log->rx.drift);
-        } else {
-          printf("\n");
-        }
+        break;
+        // printf("%s-%u-%u rx ",
+        //         log->rx.is_unicast == 0 ? "bc" : "uc", log->rx.is_data, log->rx.sec_level);
+        // log_lladdr_compact(&log->rx.src);
+        // printf("->");
+        // log_lladdr_compact(log->rx.is_unicast ? &linkaddr_node_addr : NULL);
+        // printf(", len %3u, seq %3u",
+        //         log->rx.datalen, log->rx.seqno);
+        // printf(", edr %3d", (int)log->rx.estimated_drift);
+        // if(log->rx.drift_used) {
+        //   printf(", dr %3d\n", log->rx.drift);
+        // } else {
+        //   printf("\n");
+        // }
         break;
       case tsch_log_message:
+        // printf("%s\n", log->message);
+        break;
+      case tsch_log_especial:
         printf("%s\n", log->message);
         break;
     }
