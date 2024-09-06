@@ -32,7 +32,7 @@
 
 #define MONITORING_TOGGLE_INTERVAL 60
 
-#define INT_CONF_TELEMETRY_EXPERIMENT_SIZE TELEMETRY_SIZE
+#define TELEMETRY_EXPERIMENT_SIZE TELEMETRY_SIZE
 /*---------------------------------------------------------------------------*/
 PROCESS(er_example_client, "Client | APM-6TiSCH Hybrid Approach");
 AUTOSTART_PROCESSES(&er_example_client);
@@ -85,11 +85,11 @@ PROCESS_THREAD(er_example_client, ev, data)
   }
 #endif
   NETSTACK_MAC.on();
-  tm_packets_in_coap = (uint16_t) floor( (COAP_MAX_CHUNK_SIZE - 14) / INT_CONF_TELEMETRY_EXPERIMENT_SIZE);
+  tm_packets_in_coap = (uint16_t) floor( (COAP_MAX_CHUNK_SIZE - 14) / TELEMETRY_EXPERIMENT_SIZE);
   app_trafic_generator_init();
   reset_counter();
   static coap_message_t request[1];      /* This way the packet can be treated as pointer as usual. */
-  LOG_DBG("tm_packets_in_coap %d = COAP_MAX_CHUNK_SIZE %d /  INT_CONF_TELEMETRY_EXPERIMENT_SIZE %d: false\n", tm_packets_in_coap, COAP_MAX_CHUNK_SIZE, INT_CONF_TELEMETRY_EXPERIMENT_SIZE);
+  LOG_DBG("tm_packets_in_coap %d = COAP_MAX_CHUNK_SIZE %d /  TELEMETRY_EXPERIMENT_SIZE %d: false\n", tm_packets_in_coap, COAP_MAX_CHUNK_SIZE, TELEMETRY_EXPERIMENT_SIZE);
 
   coap_endpoint_parse(SERVER_EP, strlen(SERVER_EP), &server_ep);
   
@@ -107,18 +107,18 @@ PROCESS_THREAD(er_example_client, ev, data)
         } else {
           diff_bytes_per_min = MAX((int) USER_REQ_BYTES_PER_MIN - get_counter(), 0);
           LOG_DBG("Diff bytes per min %d = %d - %d\n", diff_bytes_per_min, USER_REQ_BYTES_PER_MIN, get_counter());
-          pkts_pending = (uint16_t) floor(diff_bytes_per_min / INT_CONF_TELEMETRY_EXPERIMENT_SIZE) + 1;
+          pkts_pending = (uint16_t) floor(diff_bytes_per_min / TELEMETRY_EXPERIMENT_SIZE) + 1;
           LOG_DBG("Packets pending: %d\n", pkts_pending);
           if(diff_bytes_per_min > 0) {
             while(pkts_pending > 0){
               if (tm_packets_in_coap <= pkts_pending) {
                 LOG_DBG("tm_packets_in_coap %d < pkts_pending %d: true\n", tm_packets_in_coap, pkts_pending);
-                size_to_send = tm_packets_in_coap * INT_CONF_TELEMETRY_EXPERIMENT_SIZE;
+                size_to_send = tm_packets_in_coap * TELEMETRY_EXPERIMENT_SIZE;
                 pkts_pending = pkts_pending - tm_packets_in_coap;
               }
               else{
                 LOG_DBG("tm_packets_in_coap %d < pkts_pending %d: false\n", tm_packets_in_coap, pkts_pending);
-                size_to_send = pkts_pending * INT_CONF_TELEMETRY_EXPERIMENT_SIZE;
+                size_to_send = pkts_pending * TELEMETRY_EXPERIMENT_SIZE;
                 pkts_pending = 0;
               }
               LOG_DBG("size_to_send: %d\n", size_to_send);

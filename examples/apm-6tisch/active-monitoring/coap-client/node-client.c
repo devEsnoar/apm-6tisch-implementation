@@ -29,7 +29,7 @@
 
 #define MONITORING_TOGGLE_INTERVAL 15
 
-#define INT_CONF_TELEMETRY_EXPERIMENT_SIZE 19
+#define TELEMETRY_EXPERIMENT_SIZE 19
 /*---------------------------------------------------------------------------*/
 PROCESS(er_example_client, "Client | APM-6TiSCH Active Monitoring");
 AUTOSTART_PROCESSES(&er_example_client);
@@ -91,15 +91,15 @@ PROCESS_THREAD(er_example_client, ev, data)
           coap_init_message(request, COAP_TYPE_CON, COAP_POST, 0);
           coap_set_header_uri_path(request, service_urls[1]);
           
-          char buf[INT_CONF_TELEMETRY_EXPERIMENT_SIZE];
+          char buf[TELEMETRY_EXPERIMENT_SIZE];
           printf("--- Sending > ");
-          for(int i = 0; i < INT_CONF_TELEMETRY_EXPERIMENT_SIZE; i++) {
+          for(int i = 0; i < TELEMETRY_EXPERIMENT_SIZE; i++) {
             printf("%d", node_id);
             buf[i] = (uint8_t) node_id;
           }
           printf("\n");
 
-          coap_set_payload(request, buf, INT_CONF_TELEMETRY_EXPERIMENT_SIZE);
+          coap_set_payload(request, buf, TELEMETRY_EXPERIMENT_SIZE);
 
           LOG_INFO_COAP_EP(&server_ep);
           LOG_INFO_("\n");
